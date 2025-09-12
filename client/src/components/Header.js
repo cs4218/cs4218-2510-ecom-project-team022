@@ -40,20 +40,22 @@ const Header = () => {
               🛒 Virtual Vault
             </Link>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-              <SearchInput />
+              <li className="nav-item">
+                <SearchInput />
+              </li>
               <li className="nav-item">
                 <NavLink to="/" className="nav-link ">
                   Home
                 </NavLink>
               </li>
               <li className="nav-item dropdown">
-                <Link
+                <button
                   className="nav-link dropdown-toggle"
-                  to={"/categories"}
+                  type="button"
                   data-bs-toggle="dropdown"
                 >
                   Categories
-                </Link>
+                </button>
                 <ul className="dropdown-menu">
                   <li>
                     <Link className="dropdown-item" to={"/categories"}>
@@ -61,7 +63,7 @@ const Header = () => {
                     </Link>
                   </li>
                   {categories?.map((c) => (
-                    <li>
+                    <li key={c._id || c.slug}>
                       <Link
                         className="dropdown-item"
                         to={`/category/${c.slug}`}
@@ -89,16 +91,17 @@ const Header = () => {
               ) : (
                 <>
                   <li className="nav-item dropdown">
-                    <NavLink
+                    <button
+                      id="userMenuToggle"
                       className="nav-link dropdown-toggle"
-                      href="#"
-                      role="button"
                       data-bs-toggle="dropdown"
-                      style={{ border: "none" }}
                     >
                       {auth?.user?.name}
-                    </NavLink>
-                    <ul className="dropdown-menu">
+                    </button>
+                    <ul
+                      className="dropdown-menu"
+                      aria-labelledby="userMenuToggle"
+                    >
                       <li>
                         <NavLink
                           to={`/dashboard/${
