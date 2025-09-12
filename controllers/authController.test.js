@@ -22,16 +22,16 @@ const mockRes = () => {
 };
 
 describe("authController unit tests (happy + error paths)", () => {
-    let consoleSpy;
+  let consoleSpy;
 
-    beforeEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
     consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    });
+  });
 
-    afterEach(() => {
+  afterEach(() => {
     consoleSpy.mockRestore();
-    });
+  });
 
   // ---------------- updateProfileController ----------------
   describe("updateProfileController", () => {
@@ -48,7 +48,10 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("updates profile with valid password", async () => {
-      const req = { body: { name: "New Name", password: "123456" }, user: { _id: "uid" } };
+      const req = {
+        body: { name: "New Name", password: "123456" },
+        user: { _id: "uid" },
+      };
       const user = { _id: "uid", name: "Old Name", password: "oldhash" };
       userModel.findById.mockResolvedValue(user);
       hashPassword.mockResolvedValue("newhash");
@@ -63,44 +66,50 @@ describe("authController unit tests (happy + error paths)", () => {
 
       expect(hashPassword).toHaveBeenCalledWith("123456");
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true })
+      );
     });
 
     it("updates profile with no new password (EP case)", async () => {
       const req = { body: { name: "Keep Password" }, user: { _id: "uid" } };
       const user = { _id: "uid", name: "Old Name", password: "oldhash" };
       userModel.findById.mockResolvedValue(user);
-      userModel.findByIdAndUpdate.mockResolvedValue({ ...user, name: "Keep Password" });
+      userModel.findByIdAndUpdate.mockResolvedValue({
+        ...user,
+        name: "Keep Password",
+      });
       const res = mockRes();
 
       await updateProfileController(req, res);
 
       expect(hashPassword).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.send).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({ success: true })
+      );
     });
 
     it("handles database error gracefully", async () => {
-    const req = { body: { name: "Any Name" }, user: { _id: "uid" } };
-    const res = mockRes();
+      const req = { body: { name: "Any Name" }, user: { _id: "uid" } };
+      const res = mockRes();
 
-    userModel.findById.mockRejectedValue(new Error("DB error"));
+      userModel.findById.mockRejectedValue(new Error("DB error"));
 
-    await updateProfileController(req, res);
+      await updateProfileController(req, res);
 
-    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith(
+      expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
-        success: false,
-        message: "Error WHile Update profile",
-        error: expect.any(Error),
+          success: false,
+          message: "Error WHile Update profile",
+          error: expect.any(Error),
         })
-    );
+      );
 
-    consoleSpy.mockRestore();
+      consoleSpy.mockRestore();
     });
-
   });
 
   // ---------------- getOrdersController ----------------
@@ -111,7 +120,9 @@ describe("authController unit tests (happy + error paths)", () => {
       const mockOrders = [{ _id: "o1" }];
 
       const populateBuyer = jest.fn().mockResolvedValue(mockOrders);
-      const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
       orderModel.find.mockReturnValue({ populate: populateProducts });
 
       await getOrdersController(req, res);
@@ -124,7 +135,9 @@ describe("authController unit tests (happy + error paths)", () => {
       const res = mockRes();
 
       const populateBuyer = jest.fn().mockResolvedValue([]);
-      const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
       orderModel.find.mockReturnValue({ populate: populateProducts });
 
       await getOrdersController(req, res);
@@ -133,20 +146,22 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("handles order retrieval error gracefully", async () => {
-        const req = { user: { _id: "uid" } };
-        const res = mockRes();
+      const req = { user: { _id: "uid" } };
+      const res = mockRes();
 
-        const populateBuyer = jest.fn().mockRejectedValue(new Error("DB error"));
-        const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
-        orderModel.find.mockReturnValue({ populate: populateProducts });
+      const populateBuyer = jest.fn().mockRejectedValue(new Error("DB error"));
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
+      orderModel.find.mockReturnValue({ populate: populateProducts });
 
-        await getOrdersController(req, res);
+      await getOrdersController(req, res);
 
-        expect(console.log).toHaveBeenCalledWith(expect.any(Error));
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith(
-            expect.objectContaining({ success: false, message: expect.any(String) })
-        );
+      expect(console.log).toHaveBeenCalledWith(expect.any(Error));
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({ success: false, message: expect.any(String) })
+      );
     });
   });
 
@@ -159,7 +174,9 @@ describe("authController unit tests (happy + error paths)", () => {
 
       const sortFn = jest.fn().mockResolvedValue(mockOrders);
       const populateBuyer = jest.fn().mockReturnValue({ sort: sortFn });
-      const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
       orderModel.find.mockReturnValue({ populate: populateProducts });
 
       await getAllOrdersController(req, res);
@@ -173,7 +190,9 @@ describe("authController unit tests (happy + error paths)", () => {
 
       const sortFn = jest.fn().mockResolvedValue([]);
       const populateBuyer = jest.fn().mockReturnValue({ sort: sortFn });
-      const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
       orderModel.find.mockReturnValue({ populate: populateProducts });
 
       await getAllOrdersController(req, res);
@@ -182,29 +201,31 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("handles error while retrieving all orders", async () => {
-        const req = {};
-        const res = mockRes();
+      const req = {};
+      const res = mockRes();
 
-        // Make the query chain throw an error
-        const sortFn = jest.fn().mockRejectedValue(new Error("DB error"));
-        const populateBuyer = jest.fn().mockReturnValue({ sort: sortFn });
-        const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
-        orderModel.find.mockReturnValue({ populate: populateProducts });
+      // Make the query chain throw an error
+      const sortFn = jest.fn().mockRejectedValue(new Error("DB error"));
+      const populateBuyer = jest.fn().mockReturnValue({ sort: sortFn });
+      const populateProducts = jest
+        .fn()
+        .mockReturnValue({ populate: populateBuyer });
+      orderModel.find.mockReturnValue({ populate: populateProducts });
 
-        await getAllOrdersController(req, res);
+      await getAllOrdersController(req, res);
 
-        // Verify error logging
-        expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+      // Verify error logging
+      expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
 
-        // Verify response
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.send).toHaveBeenCalledWith(
+      // Verify response
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith(
         expect.objectContaining({
-            success: false,
-            message: "Error WHile Geting Orders",
-            error: expect.any(Error),
+          success: false,
+          message: "Error WHile Geting Orders",
+          error: expect.any(Error),
         })
-        );
+      );
     });
   });
 
@@ -239,5 +260,256 @@ describe("authController unit tests (happy + error paths)", () => {
         expect.objectContaining({ success: false, message: expect.any(String) })
       );
     });
+  });
+});
+
+import { forgotPasswordController } from "./authController.js";
+describe("forgotPasswordController", () => {
+  let req, res;
+  beforeEach(() => {
+    req = { body: {} };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  it("should return 400 if email is missing", async () => {
+    req.body = { answer: "ans", newPassword: "123456" };
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Emai is required"),
+      })
+    );
+  });
+
+  it("should return 400 if answer is missing", async () => {
+    req.body = { email: "a@b.com", newPassword: "123456" };
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("answer is required"),
+      })
+    );
+  });
+
+  it("should return 400 if newPassword is missing", async () => {
+    req.body = { email: "a@b.com", answer: "ans" };
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("New Password is required"),
+      })
+    );
+  });
+
+  it("should return 404 if user is not found", async () => {
+    req.body = { email: "a@b.com", answer: "ans", newPassword: "123456" };
+    userModel.findOne.mockResolvedValue(null);
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+
+  it("should reset password and return success if all is valid", async () => {
+    req.body = { email: "a@b.com", answer: "ans", newPassword: "123456" };
+    const user = { _id: "1", email: "a@b.com", answer: "ans" };
+    userModel.findOne.mockResolvedValue(user);
+    authHelper.hashPassword.mockResolvedValue("hashed");
+    userModel.findByIdAndUpdate = jest.fn().mockResolvedValue({});
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true })
+    );
+  });
+
+  it("should return 500 and success: false if hashPassword fails", async () => {
+    req.body = { email: "a@b.com", answer: "ans", newPassword: "123456" };
+    const user = { _id: "1", email: "a@b.com", answer: "ans" };
+    userModel.findOne.mockResolvedValue(user);
+    authHelper.hashPassword.mockRejectedValue(new Error("fail"));
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+});
+
+import { loginController } from "./authController.js";
+import JWT from "jsonwebtoken";
+
+import { registerController } from "./authController.js";
+import userModel from "../models/userModel.js";
+import * as authHelper from "../helpers/authHelper.js";
+
+jest.mock("jsonwebtoken");
+
+jest.mock("../models/userModel.js");
+jest.mock("../helpers/authHelper.js");
+
+describe("loginController", () => {
+  let req, res;
+  beforeEach(() => {
+    req = { body: {} };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  it("should return success: false if email or password is missing", async () => {
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+
+  it("should return success: false if user is not found", async () => {
+    req.body = { email: "a@b.com", password: "123456" };
+    userModel.findOne.mockResolvedValue(null);
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+
+  it("should return success: false if password does not match", async () => {
+    req.body = { email: "a@b.com", password: "123456" };
+    userModel.findOne.mockResolvedValue({ _id: "1", password: "hashed" });
+    authHelper.comparePassword.mockResolvedValue(false);
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+
+  it("should return success: true and user object if login is successful", async () => {
+    req.body = { email: "a@b.com", password: "123456" };
+    const user = {
+      _id: "1",
+      name: "A",
+      email: "a@b.com",
+      phone: "123",
+      address: "addr",
+      role: 0,
+      password: "hashed",
+    };
+    userModel.findOne.mockResolvedValue(user);
+    authHelper.comparePassword.mockResolvedValue(true);
+    JWT.sign.mockReturnValue("token");
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        user: expect.any(Object),
+        token: "token",
+      })
+    );
+  });
+
+  it("should return 500 and success: false if comparePassword throws", async () => {
+    req.body = { email: "a@b.com", password: "123456" };
+    userModel.findOne.mockResolvedValue({ _id: "1", password: "hashed" });
+    authHelper.comparePassword.mockImplementation(() => {
+      throw new Error("fail");
+    });
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+});
+
+describe("registerController", () => {
+  let req, res;
+  beforeEach(() => {
+    req = { body: {} };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  // missing all fields
+  it("should fail validation if required fields are missing", async () => {
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ error: expect.any(String) })
+    );
+  });
+
+  // all fields present but user exists
+  it("should return success: false if user already exists", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    userModel.findOne.mockResolvedValue({ _id: "1", email: "a@b.com" });
+    await registerController(req, res);
+
+    // todo: keep 200?
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
+  });
+
+  it("should register user and return success: true if user does not exist", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    userModel.findOne.mockResolvedValue(null);
+    authHelper.hashPassword.mockResolvedValue("hashed");
+    const saveMock = jest.fn().mockResolvedValue({ _id: "2", name: "A" });
+    userModel.mockImplementation(() => ({ save: saveMock }));
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, user: expect.any(Object) })
+    );
+  });
+
+  it("should return 500 and success: false if hashPassword fails", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    userModel.findOne.mockResolvedValue(null);
+    authHelper.hashPassword.mockRejectedValue(new Error("fail"));
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: false })
+    );
   });
 });
