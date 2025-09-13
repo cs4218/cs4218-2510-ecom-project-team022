@@ -4,16 +4,16 @@ import Layout from "./../components/Layout";
 const About = () => {
   return (
     <Layout title={"About us - Ecommerce app"}>
-      <div className="row contactus ">
+      <div className="row about">
         <div className="col-md-6 ">
           <img
             src="/images/about.jpeg"
-            alt="contactus"
+            alt="about us"
             style={{ width: "100%" }}
           />
         </div>
-        <div className="col-md-4">
-          <p className="text-justify mt-2">
+        <div className="col-md-6">
+          <p className="mt-2" style={{ textAlign: "justify" }}>
             Add text
           </p>
         </div>
