@@ -3,6 +3,7 @@ import Footer from './Footer';
 import Header from './Header';
 import { Helmet } from "react-helmet";
 import  { Toaster } from 'react-hot-toast';
+import PropTypes from 'prop-types';
 
 
 const Layout = ({ children, title, description, keywords, author }) => {
@@ -30,6 +31,14 @@ Layout.defaultProps = {
   description: "mern stack project",
   keywords: "mern,react,node,mongodb",
   author: "Techinfoyt",
+};
+
+Layout.propTypes = {
+  children: PropTypes.node,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  keywords: PropTypes.string,
+  author: PropTypes.string,
 };
 
 export default Layout;
