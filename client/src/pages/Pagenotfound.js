@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Layout from "./../components/Layout";
+import Layout from "../components/Layout";
 
-const Pagenotfound = () => {
+const PageNotFound = () => {
   return (
-    <Layout title={"go back- page not found"}>
-      <div className="pnf">
-        <h1 className="pnf-title">404</h1>
-        <h2 className="pnf-heading">Oops ! Page Not Found</h2>
-        <Link to="/" className="pnf-btn">
+    <Layout title={"404 - Page Not Found"}>
+      <div className="page-not-found" aria-label="page not found">
+        <h1 className="page-not-found__title">404</h1>
+        <h2 className="page-not-found__heading">Oops! Page Not Found</h2>
+        <Link to="/" className="page-not-found__btn">
           Go Back
         </Link>
       </div>
@@ -16,4 +16,4 @@ const Pagenotfound = () => {
   );
 };
 
-export default Pagenotfound;
+export default PageNotFound;
