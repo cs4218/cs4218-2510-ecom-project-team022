@@ -86,7 +86,7 @@ describe("Products", () => {
       );
     });
 
-    expect(toast.error).toHaveBeenCalledWith("Something Went Wrong");
+    expect(toast.error).toHaveBeenCalledWith("View Products: Something Went Wrong");
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
   });
