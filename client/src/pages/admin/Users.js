@@ -14,7 +14,7 @@ const Users = () => {
       setUsers(data.users); 
     } catch (error) {
       console.log(error);
-      toast.error("View User: Something Went Wrong");
+      toast.error("View Users: Something Went Wrong");
     }
   };
 
@@ -25,6 +25,8 @@ const Users = () => {
 
   const determineRole = (role) => (role === 0? "User":"Admin");
 
+  //currently, it displays both users and admins
+  //so that admins can view other admins
   return (
     <Layout title={"Dashboard - All Users"}>
         <div className="container-fluid m-3 p-3">

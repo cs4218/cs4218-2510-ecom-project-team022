@@ -14,7 +14,8 @@ const Products = () => {
       setProducts(data.products);
     } catch (error) {
       console.log(error);
-      toast.error("Something Went Wrong"); //Edited typo: Someething 
+      //Edited typo: Someething and added specification: "View Products"
+      toast.error("View Products: Something Went Wrong"); 
     }
   };
 
