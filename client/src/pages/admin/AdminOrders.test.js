@@ -66,7 +66,7 @@ describe("Admin Orders", () => {
         logSpy.mockRestore();
     });
 
-    test("if no auth token, does not get ordders", async () => {
+    test("if no auth token, does not get orders", async () => {
         useAuth.mockReturnValue([{}, jest.fn()]);
 
         await act(async () => {
