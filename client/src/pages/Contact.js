@@ -16,16 +16,19 @@ const Contact = () => {
           <h1 className="bg-dark p-2 text-white text-center">CONTACT US</h1>
           <p className="text-justify mt-2">
             For any query or info about product, feel free to call anytime. We are
-            available 24X7.  
+            available 24/7.  
           </p>
           <p className="mt-3">
-            <BiMailSend /> : www.help@ecommerceapp.com
+            <BiMailSend aria-label="email" />{" "}
+            <a href="mailto:help@ecommerceapp.com">help@ecommerceapp.com</a>
           </p>
           <p className="mt-3">
-            <BiPhoneCall /> : 012-3456789
+            <BiPhoneCall aria-label="phone" />{" "}
+            <a href="tel:0123456789">012-3456789</a>
           </p>
           <p className="mt-3">
-            <BiSupport /> : 1800-0000-0000 (toll free)
+            <BiSupport aria-label="support" />{" "}
+            <a href="tel:18000000000">1800-0000-0000</a> (toll free)
           </p>
         </div>
       </div>
