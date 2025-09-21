@@ -182,6 +182,56 @@ describe('createProductController', () => {
 });
 
 // deleteProductController
+describe('deleteProductController', () => {
+  let req;
+  let res;
+  beforeEach(() => {
+    req = {params: {pid: '12345'}};
+    res = mockResponse();
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  test('successfully delete product', async () => {
+    productModel.findByIdAndDelete.mockReturnValue({
+      select: jest.fn().mockResolvedValue({_id: "123456"}),
+    });
+
+    await productControllers.deleteProductController(req, res);
+    
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        message: productControllers.successMessages.DELETE_PRODUCT,
+        })
+      );
+    });
+
+  test('handle error properly', async () => {
+    const errorMessage = "There's an error";
+    const mockError = new Error(errorMessage);
+    productModel.findByIdAndDelete.mockReturnValue({
+      select: jest.fn().mockRejectedValueOnce(mockError),
+    });
+
+    await productControllers.deleteProductController(req, res);
+    
+    expect(logSpy).toHaveBeenCalled();
+    expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        message: productControllers.errorMessages.DELETE_PRODUCT,
+        })
+      );
+    });
+});
 
 // updateProductController
 
