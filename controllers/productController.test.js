@@ -234,6 +234,7 @@ describe('deleteProductController', () => {
       expect.objectContaining({
         success: false,
         message: productControllers.errorMessages.DELETE_PRODUCT,
+        error: mockError,
         })
       );
     });
