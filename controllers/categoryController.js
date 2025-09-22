@@ -55,7 +55,7 @@ export const createCategoryController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      errror,
+      error,
       message: errorMessages.CREATE_CATEGORY,
     });
   }
@@ -73,7 +73,7 @@ export const updateCategoryController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      messsage: successMessages.UPDATE_CATEGORY,
+      message: successMessages.UPDATE_CATEGORY,
       category,
     });
   } catch (error) {
@@ -125,7 +125,7 @@ export const singleCategoryController = async (req, res) => {
 };
 
   // Zann - Admin Actions
-export const deleteCategoryCOntroller = async (req, res) => {
+export const deleteCategoryController = async (req, res) => { //changed from deleteCategoryCOntroller
   try {
     const { id } = req.params;
     await categoryModel.findByIdAndDelete(id);

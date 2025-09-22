@@ -200,7 +200,7 @@ describe('deleteProductController', () => {
 
   test('successfully delete product', async () => {
     productModel.findByIdAndDelete.mockReturnValue({
-      select: jest.fn().mockResolvedValue(null),
+      select: jest.fn().mockResolvedValue({_id: '123456'}),
     });
 
     await productControllers.deleteProductController(req, res);
