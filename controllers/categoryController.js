@@ -1,16 +1,45 @@
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
+
+export const fieldMessages = {
+  NAME: 'Name is Required',
+}
+
+export const successMessages = {
+  // Zann - Admin Actions
+  CREATE_CATEGORY: 'New Category Created Successfully',
+  DELETE_CATEGORY: 'Category Deleted Successfully',
+  UPDATE_CATEGORY: 'Category Updated Successfully',
+  DUPLICATE_CATEGORY: 'Category Already Exist',
+
+  // Yijing - Category
+  GET_ALL_CATEGORIES: 'Get All Categories List Successfully',
+  GET_SINGLE_CATEGORY: 'Get Single Category Successfully',
+}
+
+export const errorMessages = {
+  // Zann - Admin Actions
+  CREATE_CATEGORY: 'Error While Creating New Category',
+  DELETE_CATEGORY: 'Error While Deleting Category',
+  UPDATE_CATEGORY: 'Error While Updating Category',
+
+  // Yijing - Category
+  GET_ALL_CATEGORIES: 'Error While Getting All Categories List',
+  GET_SINGLE_CATEGORY: 'Error While Getting Single Category',
+}
+
+  // Zann - Admin Actions
 export const createCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
     if (!name) {
-      return res.status(401).send({ message: "Name is required" });
+      return res.status(401).send({ message: fieldMessages.NAME });
     }
     const existingCategory = await categoryModel.findOne({ name });
     if (existingCategory) {
       return res.status(200).send({
         success: true,
-        message: "Category Already Exisits",
+        message: successMessages.DUPLICATE_CATEGORY,
       });
     }
     const category = await new categoryModel({
@@ -19,20 +48,20 @@ export const createCategoryController = async (req, res) => {
     }).save();
     res.status(201).send({
       success: true,
-      message: "new category created",
+      message: successMessages.CREATE_CATEGORY,
       category,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      errro,
-      message: "Errro in Category",
+      error,
+      message: errorMessages.CREATE_CATEGORY,
     });
   }
 };
 
-//update category
+  // Zann - Admin Actions
 export const updateCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
@@ -44,7 +73,7 @@ export const updateCategoryController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      messsage: "Category Updated Successfully",
+      message: successMessages.UPDATE_CATEGORY,
       category,
     });
   } catch (error) {
@@ -52,18 +81,18 @@ export const updateCategoryController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error while updating category",
+      message: errorMessages.UPDATE_CATEGORY,
     });
   }
 };
 
-// get all cat
+// Yijing - Category - get all categories
 export const categoryControlller = async (req, res) => {
   try {
     const category = await categoryModel.find({});
     res.status(200).send({
       success: true,
-      message: "All Categories List",
+      message: successMessages.GET_ALL_CATEGORIES,
       category,
     });
   } catch (error) {
@@ -71,18 +100,18 @@ export const categoryControlller = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error while getting all categories",
+      message: errorMessages.GET_ALL_CATEGORIES,
     });
   }
 };
 
-// single category
+// Yijing - Category
 export const singleCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
     res.status(200).send({
       success: true,
-      message: "Get SIngle Category SUccessfully",
+      message: successMessages.GET_SINGLE_CATEGORY,
       category,
     });
   } catch (error) {
@@ -90,25 +119,25 @@ export const singleCategoryController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error While getting Single Category",
+      message: errorMessages.GET_SINGLE_CATEGORY,
     });
   }
 };
 
-//delete category
-export const deleteCategoryCOntroller = async (req, res) => {
+  // Zann - Admin Actions
+export const deleteCategoryController = async (req, res) => { //changed from deleteCategoryCOntroller
   try {
     const { id } = req.params;
     await categoryModel.findByIdAndDelete(id);
     res.status(200).send({
       success: true,
-      message: "Categry Deleted Successfully",
+      message: successMessages.DELETE_CATEGORY,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while deleting category",
+      message: errorMessages.DELETE_CATEGORY,
       error,
     });
   }

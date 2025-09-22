@@ -132,12 +132,11 @@ describe('createProductController', () => {
   });
 
   test('successfully create product with photo', async () => {
-    const mockPhoto = {size:1000000, path:'/somepath', type:'image/jpg'};
+    const mockPhoto = {size:1000000, type:'image/jpg'};
     const req = {
       fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, 
-      files:{photo: mockPhoto}
+      files: {photo: mockPhoto}
     };
-    slugify.mockReturnValue('slugA');
     fs.readFileSync.mockReturnValue(Buffer.from('mockphoto'));
 
     await productControllers.createProductController(req, res);
@@ -154,8 +153,7 @@ describe('createProductController', () => {
           category: 'A', 
           quantity: 10, 
           shipping: false,
-          slug: 'slugA',
-          photo: expect.objectContaining({ data: expect.any(Buffer), contentType: 'image/jpg',}),
+          photo: expect.objectContaining({ data: Buffer.from('mockphoto'), contentType: 'image/jpg',}),
         })
     }),
   )});
@@ -166,13 +164,11 @@ describe('createProductController', () => {
       productModel.mockImplementation(() => {
         throw mockError;
       });
-      const mockPhoto = {size:10000, path:'/somepath', type:'image/jpg'};
+      const mockPhoto = {size:10000, type:'image/jpg'};
       const req = {
         fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, 
-        files:{photo: mockPhoto}
+        files: {photo: mockPhoto}
       };
-      slugify.mockReturnValue('slugA');
-      fs.readFileSync.mockReturnValue(Buffer.from('mockphoto'));
   
       await productControllers.createProductController(req, res); 
       
@@ -204,7 +200,7 @@ describe('deleteProductController', () => {
 
   test('successfully delete product', async () => {
     productModel.findByIdAndDelete.mockReturnValue({
-      select: jest.fn().mockResolvedValue(null),
+      select: jest.fn().mockResolvedValue({_id: '123456'}),
     });
 
     await productControllers.deleteProductController(req, res);
