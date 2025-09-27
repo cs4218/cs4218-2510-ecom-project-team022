@@ -119,8 +119,8 @@ describe('Login Component', () => {
     }))
   });
 
-  it('should display error message on failed login', async () => {
-    axios.post.mockRejectedValueOnce({ message: 'Invalid credentials' });
+  it('should display error message when axios failed', async () => {
+    axios.post.mockRejectedValueOnce();
 
     const { getByPlaceholderText, getByText } = render(
       <MemoryRouter initialEntries={['/login']}>
@@ -137,4 +137,37 @@ describe('Login Component', () => {
     await waitFor(() => expect(axios.post).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith('Something went wrong');
   });
+
+  it('should display server error message on failed login', async () => {
+    axios.post.mockResolvedValueOnce({ data: { success: false, message: 'Invalid credentials' } });
+
+    const { getByPlaceholderText, getByText } = render(
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'test@example.com' } });
+    fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
+    fireEvent.click(getByText('LOGIN'));
+
+    await waitFor(() => expect(axios.post).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledWith('Invalid credentials');
+  });
+
+  it('should not allow login if email or password is missing', async () => {
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(getByText('LOGIN'));
+    await waitFor(() => expect(axios.post).not.toHaveBeenCalled());
+  });
+
 });

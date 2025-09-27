@@ -20,17 +20,28 @@ describe("AdminRoute", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  // double=Mock | type=Unit
   it("renders <Spinner /> when user is null (not signed in)", () => {
     // Mock useAuth to return null user
     mockUseAuth.mockReturnValue([{ user: null, token: "" }, jest.fn()]);
-
-
 
     render(<AdminRoute />);
     expect(screen.getByText("Loading Spinner")).toBeInTheDocument();
   });
 
-  // todo
+  // double=Mock,Stub | type=Unit
+  // note: role = 0 is regular user, role = 1 is admin
+  it("renders <Spinner /> when user is not admin", async () => {
+    mockUseAuth.mockReturnValue([{ user: { name: "notadmin", role: 0 }, token: "valid-token" }, jest.fn()]);
+    axios.get.mockResolvedValue({ data: { ok: false } }); // stub
+
+    render(<AdminRoute />);
+    expect(screen.getByText("Loading Spinner")).toBeInTheDocument();
+
+  });
+
+  // double=Mock,Stub | type=Unit
   it('renders <Outlet /> when user is admin and authenticated', async () => {
     // mock /api/v1/auth/admin-auth to return { ok: true }
     axios.get.mockResolvedValue({ data: { ok: true } });
@@ -53,22 +64,6 @@ describe("AdminRoute", () => {
     require('axios').get.mockRestore();
 
 
-    //   const mockSetAuth = jest.fn();
-    //   const mockUseAuth = require('../../context/auth').useAuth;
-    //   mockUseAuth.mockReturnValue([{
-    //     user: { name: "Admin User", role: 1 },
-    //     token: "valid-admin-token",
-    //   }, mockSetAuth]);
-
-    //   // Mock axios.get to simulate admin-auth endpoint returning ok: true
-    //   jest.spyOn(require('axios'), 'get').mockResolvedValue({ data: { ok: true } });
-
-    //   const { container } = render(<AdminRoute />);
-    //   // Since Outlet renders nothing by default, we check that Spinner is not rendered
-
-
-    //   // Clean up mock
-    //   require('axios').get.mockRestore();
   });
 
 });
