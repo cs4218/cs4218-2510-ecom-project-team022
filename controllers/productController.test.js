@@ -840,7 +840,264 @@ describe('productCategoryController', () => {
 
 /* ---------- TZU CHE : PAYMENT GATEWAY ---------- */
 
-// braintreeTokenController
+describe('Braintree controllers', () => {
+  let productControllers;
+  let OrderModel;   // constructor mock
+  let gateway;      // concrete mocked gateway instance (clientToken.generate, transaction.sale)
+  let res;
 
-// brainTreePaymentController
+  const mockRes = () => {
+    const r = {};
+    r.status = jest.fn().mockReturnValue(r);
+    r.send = jest.fn().mockReturnValue(r);
+    r.json = jest.fn().mockReturnValue(r);
+    return r;
+  };
 
+  // helper: build and install a fresh braintree mock that returns a *stable* instance
+  const installBraintreeMock = (overrides = {}) => {
+    const instance = {
+      clientToken: {
+        generate: jest.fn(),
+      },
+      transaction: {
+        sale: jest.fn(),
+      },
+    };
+    // allow per-test overrides like { clientToken: { generate: fn }, transaction: { sale: fn } }
+    if (overrides.clientToken?.generate) {
+      instance.clientToken.generate = overrides.clientToken.generate;
+    }
+    if (overrides.transaction?.sale) {
+      instance.transaction.sale = overrides.transaction.sale;
+    }
+
+    jest.doMock('braintree', () => ({
+      __esModule: true,
+      default: {
+        BraintreeGateway: jest.fn(() => instance),
+        Environment: { Sandbox: {} },
+      },
+      BraintreeGateway: jest.fn(() => instance),
+      Environment: { Sandbox: {} },
+    }));
+
+    return instance;
+  };
+
+  beforeEach(async () => {
+    jest.resetModules();
+    jest.clearAllMocks();
+    res = mockRes();
+
+    // default mocks (you can override per test by calling installBraintreeMock again in the test)
+    gateway = installBraintreeMock();
+
+    // mock Order model as a constructor (controller calls `new orderModel(...)`)
+    jest.doMock('../models/orderModel.js', () => ({
+      __esModule: true,
+      default: jest.fn(() => ({ save: jest.fn().mockResolvedValue({}) })),
+    }));
+
+    // import after mocks are in place
+    productControllers = await import('./productController.js');
+    OrderModel = (await import('../models/orderModel.js')).default;
+  });
+
+  test('Success: Payment Gateway API Token – send client token', async () => {
+    gateway.clientToken.generate.mockImplementation((opts, cb) =>
+      cb(null, { clientToken: 'ctok-test' })
+    );
+
+    await productControllers.braintreeTokenController({}, res);
+
+    expect(gateway.clientToken.generate).toHaveBeenCalled();
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ clientToken: 'ctok-test' })
+    );
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  test('Failure: Payment Gateway API Token – respond 500 on error', async () => {
+    gateway.clientToken.generate.mockImplementation((opts, cb) =>
+      cb(new Error('token-gen-failed'))
+    );
+
+    await productControllers.braintreeTokenController({}, res);
+
+    expect(gateway.clientToken.generate).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  test('Failure: Payment – respond 500 when transaction.sale errors', async () => {
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(new Error('sale-failed'))
+    );
+
+    const req = {
+      body: { nonce: 'n1', cart: [{ _id: 'p1', price: 10 }] },
+      user: { _id: 'buyer-1' },
+    };
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(gateway.transaction.sale).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(expect.any(Error));
+    expect(OrderModel).not.toHaveBeenCalled();
+  });
+
+  test('Success: Payment – save order and return ok', async () => {
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(null, { id: 'tx-1', success: true })
+    );
+
+    const req = {
+      body: { nonce: 'n-ok', cart: [{ _id: 'p1', price: 12 }] },
+      user: { _id: 'buyer-ok' },
+    };
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(gateway.transaction.sale).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: 12,
+        paymentMethodNonce: 'n-ok',
+        options: { submitForSettlement: true },
+      }),
+      expect.any(Function)
+    );
+
+    expect(OrderModel).toHaveBeenCalledWith(
+      expect.objectContaining({
+        products: req.body.cart,
+        buyer: req.user._id,
+        payment: expect.objectContaining({ id: 'tx-1' }),
+      })
+    );
+    const orderInstance = OrderModel.mock.results[0].value;
+    expect(orderInstance.save).toHaveBeenCalled();
+
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+  });
+
+  test('Failure: Payment – result.success === false => 500 & no order saved', async () => {
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(null, { id: 'tx-fail', success: false })
+    );
+
+    const req = {
+      body: { nonce: 'n-fail', cart: [{ _id: 'p1', price: 10 }] },
+      user: { _id: 'buyer-1' },
+    };
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(gateway.transaction.sale).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(expect.any(Object));
+    expect(OrderModel).not.toHaveBeenCalled();
+  });
+
+  test('Success: Payment – passes numeric total (detect string-concat bug)', async () => {
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(null, { id: 'tx-ok', success: true })
+    );
+
+    const req = {
+      body: { nonce: 'n-ok', cart: [{ _id: 'p1', price: '10' }, { _id: 'p2', price: 5 }] },
+      user: { _id: 'buyer-ok' },
+    };
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    // the request passed to sale
+    const passedArgs = gateway.transaction.sale.mock.calls[0][0];
+    expect(passedArgs.amount).toBe(15);
+
+    const orderInstance = OrderModel.mock.results[0].value;
+    expect(orderInstance.save).toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+  });
+
+    test('Failure: Payment Gateway API Token – synchronous throw is caught (logs)', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    gateway.clientToken.generate.mockImplementation(() => {
+      throw new Error('sync-token-throw');
+    });
+
+    await productControllers.braintreeTokenController({}, res);
+
+    expect(gateway.clientToken.generate).toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalled();            // catch path covered
+    // controller does not send a response in this catch (by design)
+    expect(res.status).not.toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+
+  test('Failure: Payment – DB save error returns 500', async () => {
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(null, { id: 'tx-ok', success: true })
+    );
+    // make the OrderModel constructor return an instance whose save() rejects
+    OrderModel.mockImplementation(() => ({
+      save: jest.fn().mockRejectedValue(new Error('db-save-fail')),
+    }));
+
+    const req = {
+      body: { nonce: 'n-ok', cart: [{ _id: 'p1', price: 12 }] },
+      user: { _id: 'buyer-ok' },
+    };
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(gateway.transaction.sale).toHaveBeenCalled();
+    expect(OrderModel).toHaveBeenCalled();        // attempted to save
+    expect(res.status).toHaveBeenCalledWith(500); // inner catch covered
+    expect(res.send).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  test('Failure: Payment – synchronous throw before/inside sale() is caught & returns 500', async () => {
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    // make sale throw synchronously so outer try/catch handles it
+    gateway.transaction.sale.mockImplementation(() => {
+      throw new Error('sync-sale-throw');
+    });
+
+    const req = {
+      body: { nonce: 'n1', cart: [{ _id: 'p1', price: 10 }] },
+      user: { _id: 'buyer-1' },
+    };
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(gateway.transaction.sale).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500); // outer catch covered
+    expect(res.send).toHaveBeenCalledWith(expect.any(Error));
+    logSpy.mockRestore();
+  });
+
+  test('Failure: Payment – non-numeric prices are ignored in total calc', async () => {
+    // success path to reach total computation, then sale succeeds
+    gateway.transaction.sale.mockImplementation((opts, cb) =>
+      cb(null, { id: 'tx-ok', success: true })
+    );
+    const req = {
+      body: {
+        nonce: 'n-ok',
+        cart: [
+          { _id: 'p1', price: '10' },      // coerces to 10
+          { _id: 'p2', price: 'oops' },    // ignored => 0
+          { _id: 'p3', price: 5 },         // 5
+          { _id: 'p4' },                   // undefined => 0
+        ],
+      },
+      user: { _id: 'buyer-ok' },
+    };
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    const passedArgs = gateway.transaction.sale.mock.calls[0][0];
+    expect(passedArgs.amount).toBe(15);   // 10 + 0 + 5 + 0
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+  });
+});
