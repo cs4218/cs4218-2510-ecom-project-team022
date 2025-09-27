@@ -1,16 +1,10 @@
 export default {
-  // display name
   displayName: "backend",
-
-  // when testing backend
   testEnvironment: "node",
-
-  // which test to run
-  testMatch: ["<rootDir>/controllers/*.test.js"],
-
-  // jest code coverage
+  testMatch: ["**/?(*.)+(test).[jt]s?(x)"],
+  testPathIgnorePatterns: ["<rootDir>/client/"],
   collectCoverage: true,
-  collectCoverageFrom: ["controllers/**"],
+  collectCoverageFrom: ["controllers/**", "routes/**", "middlewares/**", "helpers/**"],
   coverageThreshold: {
     global: {
       lines: 100,
