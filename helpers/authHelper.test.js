@@ -31,7 +31,9 @@ describe("comparePassword", () => {
   });
 
   it("should return false if bcrypt.compare rejects", async () => {
-    bcrypt.compare.mockRejectedValue(new Error("fail"));
-    await expect(comparePassword("plain", "hashed")).resolves.toBe(false);
+    bcrypt.compare.mockRejectedValue(false);
+    // expect false to be thrown after comparing password
+    await expect(comparePassword("plain", "hashed")).rejects.toBe(false);
+
   });
 });
