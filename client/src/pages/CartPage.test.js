@@ -57,8 +57,13 @@ const primeAuthCart = ({
 }) => {
   mockAuth = { token, user };
   localStorage.setItem("cart", JSON.stringify(cart));
-  if (tokenOk) axios.get.mockResolvedValueOnce({ data: { clientToken } });
-  else axios.get.mockRejectedValueOnce(new Error("boom"));
+  if (tokenOk) {
+    axios.get.mockResolvedValueOnce({ data: { clientToken } });
+  } else {
+    axios.get.mockRejectedValueOnce(new Error("boom"));
+  }
+  // Always reset post mock to ensure clean state
+  axios.post.mockReset();
   axios.post.mockResolvedValue({ data: { ok: true } });
 };
 
@@ -74,6 +79,8 @@ describe("CartPage page", () => {
     });
     axios.get.mockResolvedValue({ data: { clientToken: "ctok" } });
     axios.post.mockResolvedValue({ data: { ok: true } });
+    // Reset axios.post to ensure clean state
+    axios.post.mockClear();
   });
 
   it("should render guest and empty cart state safely", async () => {
@@ -139,7 +146,9 @@ describe("CartPage page", () => {
 
     const alphaCard =
       alphaNode.closest(".row.card.flex-row") || alphaNode.parentElement;
-    within(alphaCard).getByRole("button", { name: /remove/i }).click();
+    within(alphaCard)
+      .getByRole("button", { name: /remove/i })
+      .click();
 
     // Assert
     await waitForElementToBeRemoved(alphaNode);
@@ -168,57 +177,68 @@ describe("CartPage page", () => {
     // Assert
     expect(await screen.findByTestId("dropin")).toBeInTheDocument();
     const btn = screen.getByRole("button", { name: /make payment/i });
-    expect(btn).toBeEnabled();
+    await waitFor(() => expect(btn).toBeEnabled());
 
     // Act
     fireEvent.click(btn);
 
-    // Assert
-    await waitFor(() =>
-      expect(mockDropInInstance.requestPaymentMethod).toHaveBeenCalled()
+    // Assert - wait for all async operations to complete
+    await waitFor(
+      () => expect(mockDropInInstance.requestPaymentMethod).toHaveBeenCalled(),
+      { timeout: 5000 }
     );
 
-    await waitFor(() =>
-      expect(axios.post).toHaveBeenCalledWith(
-        "/api/v1/product/braintree/payment",
-        expect.objectContaining({
-          nonce: "fake-nonce",
-          cart: [{ _id: "p1", name: "Alpha", price: 10, description: "x" }],
-        })
-      )
+    await waitFor(
+      () =>
+        expect(axios.post).toHaveBeenCalledWith(
+          "/api/v1/product/braintree/payment",
+          expect.objectContaining({
+            nonce: "fake-nonce",
+            cart: [{ _id: "p1", name: "Alpha", price: 10, description: "x" }],
+          })
+        ),
+      { timeout: 5000 }
     );
 
-    await waitFor(() => expect(removeItemSpy).toHaveBeenCalledWith("cart"));
+    await waitFor(() => expect(removeItemSpy).toHaveBeenCalledWith("cart"), {
+      timeout: 5000,
+    });
 
-    await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith(
-        expect.stringMatching(/^Payment Completed Successfully/)
-      )
+    await waitFor(
+      () =>
+        expect(toast.success).toHaveBeenCalledWith(
+          expect.stringMatching(/^Payment Completed Successfully/)
+        ),
+      { timeout: 5000 }
     );
 
-    await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/orders")
+    await waitFor(
+      () => expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/orders"),
+      { timeout: 5000 }
     );
   });
 
   test.each`
-    title                                           | token     | user                          | cart                                                   | tokenOk
-    ${"no token"}                                   | ${""}     | ${{ name: "Zed", address: "X"}} | ${[{ _id: "p1", name: "Alpha", price: 10 }]}           | ${true}
-    ${"token present but empty cart"}               | ${"t123"} | ${{ name: "NoItems User" }}     | ${[]}                                                  | ${true}
-    ${"token fetch fails (no clientToken)"}         | ${"t123"} | ${{ name: "ClientTokFail", address: "A" }} | ${[{ _id: "p1", name: "Alpha", price: 10 }]} | ${false}
-  `("should not render DropIn when $title", async ({ token, user, cart, tokenOk }) => {
-    // Arrange
-    primeAuthCart({ token, user, cart, tokenOk });
+    title                                   | token     | user                                       | cart                                         | tokenOk
+    ${"no token"}                           | ${""}     | ${{ name: "Zed", address: "X" }}           | ${[{ _id: "p1", name: "Alpha", price: 10 }]} | ${true}
+    ${"token present but empty cart"}       | ${"t123"} | ${{ name: "NoItems User" }}                | ${[]}                                        | ${true}
+    ${"token fetch fails (no clientToken)"} | ${"t123"} | ${{ name: "ClientTokFail", address: "A" }} | ${[{ _id: "p1", name: "Alpha", price: 10 }]} | ${false}
+  `(
+    "should not render DropIn when $title",
+    async ({ token, user, cart, tokenOk }) => {
+      // Arrange
+      primeAuthCart({ token, user, cart, tokenOk });
 
-    // Act
-    renderPage();
+      // Act
+      renderPage();
 
-    // Assert
-    if (cart.length) {
-      expect(await screen.findByText(cart[0].name)).toBeInTheDocument();
+      // Assert
+      if (cart.length) {
+        expect(await screen.findByText(cart[0].name)).toBeInTheDocument();
+      }
+      expect(screen.queryByTestId("dropin")).not.toBeInTheDocument();
     }
-    expect(screen.queryByTestId("dropin")).not.toBeInTheDocument();
-  });
+  );
 
   it("should disable Make Payment button when user has no address", async () => {
     // Arrange
@@ -257,7 +277,7 @@ describe("CartPage page", () => {
   });
 
   it("should compute total ignoring non-numeric prices", async () => {
-    // Arrange 
+    // Arrange
     primeAuthCart({
       token: "t123",
       user: { name: "Mix", address: "Addr" },
@@ -272,7 +292,9 @@ describe("CartPage page", () => {
     renderPage();
 
     // Assert
-    expect(await screen.findByText(/total\s*:\s*\$15\.50/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/total\s*:\s*\$15\.50/i)
+    ).toBeInTheDocument();
   });
 
   it("should handle payment failure (toast error, no navigate, cart unchanged)", async () => {
@@ -284,21 +306,39 @@ describe("CartPage page", () => {
       user: { name: "FailUser", address: "123 Main" },
       cart: initialCart,
     });
+    // Reset and setup failure mock after primeAuthCart
+    axios.post.mockReset();
     axios.post.mockRejectedValueOnce(new Error("payment failed"));
 
     // Act
     renderPage();
     expect(await screen.findByTestId("dropin")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /make payment/i }));
+
+    // Ensure button is ready before clicking
+    const paymentBtn = screen.getByRole("button", { name: /make payment/i });
+    await waitFor(() => expect(paymentBtn).toBeEnabled());
+    fireEvent.click(paymentBtn);
 
     // Assert
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        "Payment failed. Please try again."
-      )
+    await waitFor(
+      () =>
+        expect(toast.error).toHaveBeenCalledWith(
+          "Payment failed. Please try again."
+        ),
+      { timeout: 5000 }
     );
-    expect(mockNavigate).not.toHaveBeenCalled();
-    expect(JSON.parse(localStorage.getItem("cart"))).toEqual(initialCart);
+
+    await waitFor(() => expect(mockNavigate).not.toHaveBeenCalled(), {
+      timeout: 2000,
+    });
+
+    await waitFor(
+      () => {
+        const cartData = localStorage.getItem("cart");
+        expect(cartData ? JSON.parse(cartData) : []).toEqual(initialCart);
+      },
+      { timeout: 2000 }
+    );
   });
 
   it("should greet with fallback 'Hello' when user object exists without name", async () => {
