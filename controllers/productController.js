@@ -60,7 +60,7 @@ var gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 });
 
-// Zann - Admin View Product
+// Marcus - Admin Create Product
 export const createProductController = async (req, res) => {
   try {
     const { name, description, price, category, quantity, shipping } =

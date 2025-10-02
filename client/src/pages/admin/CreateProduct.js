@@ -27,7 +27,7 @@ const CreateProduct = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something wwent wrong in getting catgeory");
+      toast.error("Something went wrong in getting category");
     }
   };
 
@@ -46,12 +46,13 @@ const CreateProduct = () => {
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
-      const { data } = axios.post(
+      const { data } = await axios.post(
         "/api/v1/product/create-product",
         productData
       );
-      if (data?.success) {
-        toast.error(data?.message);
+      if (!data?.success) {
+        console.log(data);
+        toast.error(data?.error || data?.message);
       } else {
         toast.success("Product Created Successfully");
         navigate("/dashboard/admin/products");
@@ -81,6 +82,7 @@ const CreateProduct = () => {
                 onChange={(value) => {
                   setCategory(value);
                 }}
+                id="category-select-input"
               >
                 {categories?.map((c) => (
                   <Option key={c._id} value={c._id}>
@@ -99,6 +101,11 @@ const CreateProduct = () => {
                     hidden
                   />
                 </label>
+              </div>
+              <div className="mb-3">
+                <button id="create-product-btn" className="btn btn-primary" onClick={handleCreate}>
+                  CREATE PRODUCT
+                </button>
               </div>
               <div className="mb-3">
                 {photo && (
@@ -164,11 +171,7 @@ const CreateProduct = () => {
                   <Option value="1">Yes</Option>
                 </Select>
               </div>
-              <div className="mb-3">
-                <button className="btn btn-primary" onClick={handleCreate}>
-                  CREATE PRODUCT
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
