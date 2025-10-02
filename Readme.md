@@ -144,3 +144,40 @@ To begin unit testing with Jest in your project, follow these steps:
      ```bash
      npm run test
      ```
+
+## Milestone 1
+
+### 1. CI Github workflow link:  https://github.com/cs4218/cs4218-2510-ecom-project-team022/actions 
+
+### 2. Members' Contributions
+
+The following shows the scope of our individal unit testing and bug fixing. 
+
+#### Krista
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+
+#### Zann
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Admin Actions| - components/Form/CategoryForm.js <br> - pages/admin/CreateCategory.js| - controllers/categoryController.js <br> 1. createCategoryController <br> 2. updateCategoryController <br> 3. deleteCategoryController|
+|Admin View Orders| - pages/admin/AdminOrders.js||
+|Admin View Products| - pages/admin/Products.js| - controllers/productController.js <br> 1. createProductController <br> 2. deleteProductController <br> 3. updateProductController|
+|Admin View Users| - pages/admin/Users.js||
+
+#### Marcus
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+
+#### Yi Jing
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+
+#### Tzu Che
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
