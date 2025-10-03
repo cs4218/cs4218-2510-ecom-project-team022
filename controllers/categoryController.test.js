@@ -66,7 +66,9 @@ describe('createCategoryController', () => {
 
     test('return error when name missing', async () => {
         const req = {body: {}};
+
         await categoryControllers.createCategoryController(req, res);
+        
         expect(res.status).toHaveBeenCalledWith(401);
         expect(res.send.mock.calls[0][0].message).toBe(categoryControllers.fieldMessages.NAME);
     });
