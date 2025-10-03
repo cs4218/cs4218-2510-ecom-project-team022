@@ -85,7 +85,7 @@ export const createProductController = async (req, res) => {
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
-    if (photo) {
+    if (photo) { //note
       products.photo.data = fs.readFileSync(photo.path);
       products.photo.contentType = photo.type;
     }
@@ -217,7 +217,7 @@ export const updateProductController = async (req, res) => {
       { ...req.fields, slug: slugify(name) },
       { new: true }
     );
-    if (photo) {
+    if (photo) { //note
       products.photo.data = fs.readFileSync(photo.path);
       products.photo.contentType = photo.type;
     }

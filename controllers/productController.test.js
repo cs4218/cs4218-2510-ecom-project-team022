@@ -91,42 +91,54 @@ describe('createProductController', () => {
 
   test('return error when name missing', async () => {
     const req = {fields: {description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.NAME);
   });
 
   test('return error when description missing', async () => {
     const req = {fields: {name: 'A', price: 20, category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.DESCRIPTION);
   });
 
   test('return error when price missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.PRICE);
   });
 
   test('return error when category missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, quantity: 10, shipping: false}, files:{}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.CATEGORY);
   });
 
   test('return error when quantity missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', shipping: false}, files:{}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.QUANTITY);
   });
 
   test('return error when photo too large', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, files:{photo:{size:1000001}}};
+
     await productControllers.createProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.PHOTO);
   });
@@ -253,42 +265,54 @@ describe('updateProductController', () => {
 
   test('return error when name missing', async () => {
     const req = {fields: {description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.updateProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.NAME);
   });
 
   test('return error when description missing', async () => {
     const req = {fields: {name: 'A', price: 20, category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.updateProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.DESCRIPTION);
   });
 
   test('return error when price missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', category: 'A', quantity: 10, shipping: false}, files:{}};
+
     await productControllers.updateProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.PRICE);
   });
 
   test('return error when category missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, quantity: 10, shipping: false}, files:{}};
+
     await productControllers.updateProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.CATEGORY);
   });
 
   test('return error when quantity missing', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', shipping: false}, files:{}};
+
     await productControllers.updateProductController(req, res);
+
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.QUANTITY);
   });
 
   test('return error when photo too large', async () => {
     const req = {fields: {name: 'A', description: 'descriptionA', price: 20, category: 'A', quantity: 10, shipping: false}, files:{photo:{size:1000001}}};
+
     await productControllers.updateProductController(req, res);
+    
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send.mock.calls[0][0].error).toBe(productControllers.fieldMessages.PHOTO);
   });
