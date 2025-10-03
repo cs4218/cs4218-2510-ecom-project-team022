@@ -36,21 +36,17 @@ describe("Orders Component", () => {
   });
 
   it("renders layout and UserMenu safely", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Alice" } });
     axios.get.mockResolvedValue({ data: [] });
 
-    // Act
     renderOrders();
 
-    // Assert
     expect(await screen.findByTestId("layout")).toBeInTheDocument();
     expect(screen.getByTestId("user-menu")).toBeInTheDocument();
     expect(screen.getByText("All Orders")).toBeInTheDocument();
   });
 
   it("fetches and displays a single order with successful payment", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Alice" } });
     axios.get.mockResolvedValue({
       data: [
@@ -67,10 +63,8 @@ describe("Orders Component", () => {
       ],
     });
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(screen.getByText("Alice")).toBeInTheDocument());
     expect(screen.getByText("Processing")).toBeInTheDocument();
     expect(screen.getByText(/Success/)).toBeInTheDocument();
@@ -78,7 +72,6 @@ describe("Orders Component", () => {
   });
 
   it("renders 'Failed' when payment is unsuccessful", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Bob" } });
     axios.get.mockResolvedValue({
       data: [
@@ -95,16 +88,13 @@ describe("Orders Component", () => {
       ],
     });
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(screen.getByText("Bob")).toBeInTheDocument());
     expect(screen.getByText(/Failed/)).toBeInTheDocument();
   });
 
   it("renders multiple orders and multiple products correctly", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Carol" } });
     axios.get.mockResolvedValue({
       data: [
@@ -130,10 +120,8 @@ describe("Orders Component", () => {
       ],
     });
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(screen.getByText("Carol")).toBeInTheDocument());
     expect(screen.getByText("Dan")).toBeInTheDocument();
     expect(screen.getByText("A")).toBeInTheDocument();
@@ -144,45 +132,35 @@ describe("Orders Component", () => {
   });
 
   it("does not fetch orders if no token", () => {
-    // Arrange
     primeAuth({ token: "", user: null });
 
-    // Act
     renderOrders();
 
-    // Assert
     expect(axios.get).not.toHaveBeenCalled();
   });
 
   it("renders gracefully with no orders", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Alice" } });
     axios.get.mockResolvedValue({ data: [] });
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(screen.getByText("All Orders")).toBeInTheDocument());
     expect(screen.queryByText("Buyer")).not.toBeInTheDocument();
   });
 
   it("logs error when API call fails", async () => {
-    // Arrange
     const consoleSpy = jest.spyOn(console, "log").mockImplementation();
     primeAuth({ token: "mock-token", user: { name: "Alice" } });
     axios.get.mockRejectedValue(new Error("API error"));
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error)));
     consoleSpy.mockRestore();
   });
 
   it("handles order with empty products array gracefully", async () => {
-    // Arrange
     primeAuth({ token: "mock-token", user: { name: "Eve" } });
     axios.get.mockResolvedValue({
       data: [
@@ -197,10 +175,8 @@ describe("Orders Component", () => {
       ],
     });
 
-    // Act
     renderOrders();
 
-    // Assert
     await waitFor(() => expect(screen.getByText("Eve")).toBeInTheDocument());
     expect(screen.queryByText("Product")).not.toBeInTheDocument();
   });

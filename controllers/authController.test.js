@@ -22,14 +22,16 @@ const mockRes = () => {
 };
 
 describe("authController unit tests (happy + error paths)", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, "log").mockImplementation(() => {}); // silence error logs
-  });
+    let consoleSpy;
 
-  afterEach(() => {
-    console.log.mockRestore();
-  });
+    beforeEach(() => {
+    jest.clearAllMocks();
+    consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+    consoleSpy.mockRestore();
+    });
 
   // ---------------- updateProfileController ----------------
   describe("updateProfileController", () => {
@@ -79,18 +81,26 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("handles database error gracefully", async () => {
-      const req = { body: {}, user: { _id: "uid" } };
-      userModel.findById.mockRejectedValue(new Error("DB error"));
-      const res = mockRes();
+    const req = { body: { name: "Any Name" }, user: { _id: "uid" } };
+    const res = mockRes();
 
-      await updateProfileController(req, res);
+    userModel.findById.mockRejectedValue(new Error("DB error"));
 
-      expect(console.log).toHaveBeenCalledWith(expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false, message: expect.any(String) })
-      );
+    await updateProfileController(req, res);
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+        success: false,
+        message: "Error WHile Update profile",
+        error: expect.any(Error),
+        })
+    );
+
+    consoleSpy.mockRestore();
     });
+
   });
 
   // ---------------- getOrdersController ----------------
@@ -123,22 +133,20 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("handles order retrieval error gracefully", async () => {
-      const req = { user: { _id: "uid" } };
-      const res = mockRes();
+        const req = { user: { _id: "uid" } };
+        const res = mockRes();
 
-      orderModel.find.mockImplementation(() => ({
-        populate: jest.fn().mockReturnThis(),
-        populate2: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockRejectedValue(new Error("DB error")),
-      }));
+        const populateBuyer = jest.fn().mockRejectedValue(new Error("DB error"));
+        const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+        orderModel.find.mockReturnValue({ populate: populateProducts });
 
-      await getOrdersController(req, res);
+        await getOrdersController(req, res);
 
-      expect(console.log).toHaveBeenCalledWith(expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.send).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false, message: expect.any(String) })
-      );
+        expect(console.log).toHaveBeenCalledWith(expect.any(Error));
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith(
+            expect.objectContaining({ success: false, message: expect.any(String) })
+        );
     });
   });
 
@@ -174,21 +182,29 @@ describe("authController unit tests (happy + error paths)", () => {
     });
 
     it("handles error while retrieving all orders", async () => {
-      const req = {};
-      const res = mockRes();
+        const req = {};
+        const res = mockRes();
 
-      orderModel.find.mockImplementation(() => ({
-        populate: jest.fn().mockReturnThis(),
-        sort: jest.fn().mockRejectedValue(new Error("DB error")),
-      }));
+        // Make the query chain throw an error
+        const sortFn = jest.fn().mockRejectedValue(new Error("DB error"));
+        const populateBuyer = jest.fn().mockReturnValue({ sort: sortFn });
+        const populateProducts = jest.fn().mockReturnValue({ populate: populateBuyer });
+        orderModel.find.mockReturnValue({ populate: populateProducts });
 
-      await getAllOrdersController(req, res);
+        await getAllOrdersController(req, res);
 
-      expect(console.log).toHaveBeenCalledWith(expect.any(Error));
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.send).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false, message: expect.any(String) })
-      );
+        // Verify error logging
+        expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+
+        // Verify response
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+            success: false,
+            message: "Error WHile Geting Orders",
+            error: expect.any(Error),
+        })
+        );
     });
   });
 
