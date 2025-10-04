@@ -28,6 +28,8 @@ export default {
                         "client/src/components/**",
                         "client/src/context/**",
                         "client/src/context/**",
+                        "client/src/hooks/**",
+
   ],
   coverageThreshold: {
     global: {
