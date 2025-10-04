@@ -34,12 +34,11 @@ const Profile = () => {
         phone,
         address,
       });
-      if (data?.errro) {
+      if (data?.error) {
         toast.error(data?.error);
       } else {
         setAuth({ ...auth, user: data?.updatedUser });
-        let ls = localStorage.getItem("auth");
-        ls = JSON.parse(ls);
+        let ls = JSON.parse(localStorage.getItem("auth")) || {};
         ls.user = data.updatedUser;
         localStorage.setItem("auth", JSON.stringify(ls));
         toast.success("Profile Updated Successfully");
@@ -58,7 +57,7 @@ const Profile = () => {
           </div>
           <div className="col-md-9">
             <div className="form-container ">
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} data-testid="profile-form">
                 <h4 className="title">USER PROFILE</h4>
                 <div className="mb-3">
                   <input
