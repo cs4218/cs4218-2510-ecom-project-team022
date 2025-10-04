@@ -102,11 +102,7 @@ const CreateProduct = () => {
                   />
                 </label>
               </div>
-              <div className="mb-3">
-                <button id="create-product-btn" className="btn btn-primary" onClick={handleCreate}>
-                  CREATE PRODUCT
-                </button>
-              </div>
+
               <div className="mb-3">
                 {photo && (
                   <div className="text-center">
@@ -171,7 +167,15 @@ const CreateProduct = () => {
                   <Option value="1">Yes</Option>
                 </Select>
               </div>
-
+              <div className="mb-3">
+                <button
+                  id="create-product-btn"
+                  className="btn btn-primary"
+                  onClick={handleCreate}
+                >
+                  CREATE PRODUCT
+                </button>
+              </div>
             </div>
           </div>
         </div>
