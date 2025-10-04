@@ -12,7 +12,7 @@ export const successMessages = {
   UPDATE_CATEGORY: 'Category Updated Successfully',
   DUPLICATE_CATEGORY: 'Category Already Exist',
 
-  // Yijing - Category
+  // Yi Jing - Category
   GET_ALL_CATEGORIES: 'Get All Categories List Successfully',
   GET_SINGLE_CATEGORY: 'Get Single Category Successfully',
 }
@@ -23,7 +23,7 @@ export const errorMessages = {
   DELETE_CATEGORY: 'Error While Deleting Category',
   UPDATE_CATEGORY: 'Error While Updating Category',
 
-  // Yijing - Category
+  // Yi Jing - Category
   GET_ALL_CATEGORIES: 'Error While Getting All Categories List',
   GET_SINGLE_CATEGORY: 'Error While Getting Single Category',
 }
@@ -86,7 +86,7 @@ export const updateCategoryController = async (req, res) => {
   }
 };
 
-// Yijing - Category - get all categories
+// Yi Jing - Category - get all categories
 export const categoryControlller = async (req, res) => {
   try {
     const category = await categoryModel.find({});
@@ -105,7 +105,7 @@ export const categoryControlller = async (req, res) => {
   }
 };
 
-// Yijing - Category
+// Yi Jing - Category
 export const singleCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.findOne({ slug: req.params.slug });
