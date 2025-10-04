@@ -10,47 +10,47 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const fieldMessages = {
-  NAME: 'Name is Required',
-  DESCRIPTION: 'Description is Required',
-  PRICE: 'Price is Required',
-  CATEGORY: 'Category is Required',
-  QUANTITY: 'Quantity is Required',
-  PHOTO: 'Photo should be less then 1 MB'
-}
+  NAME: "Name is Required",
+  DESCRIPTION: "Description is Required",
+  PRICE: "Price is Required",
+  CATEGORY: "Category is Required",
+  QUANTITY: "Quantity is Required",
+  PHOTO: "Photo should be less then 1 MB",
+};
 
 export const successMessages = {
   // Zann - Admin View Products
-  CREATE_PRODUCT: 'Product Created Successfully',
-  DELETE_PRODUCT: 'Product Deleted Successfully',
-  UPDATE_PRODUCT: 'Product Updated Successfully',
+  CREATE_PRODUCT: "Product Created Successfully",
+  DELETE_PRODUCT: "Product Deleted Successfully",
+  UPDATE_PRODUCT: "Product Updated Successfully",
 
   // Krista - Product
-  GET_PRODUCT: 'All Products Fetched Successfully',
-  GET_SINGLE_PRODUCT: 'Single Product Fetched Successfully',
-  PRODUCT_FILTER: 'Products Filtered Successfully',
-  PRODUCT_COUNT: 'Products Counted Successfully.',
-  PRODUCT_LIST: 'Products Listed Successfully',
-  RELATED_PRODUCT: 'Related Products Fetched Successfully',
-  PRODUCT_CATEGORY: 'Products Per Category Fetched Successfully',
-}
+  GET_PRODUCT: "All Products Fetched Successfully",
+  GET_SINGLE_PRODUCT: "Single Product Fetched Successfully",
+  PRODUCT_FILTER: "Products Filtered Successfully",
+  PRODUCT_COUNT: "Products Counted Successfully.",
+  PRODUCT_LIST: "Products Listed Successfully",
+  RELATED_PRODUCT: "Related Products Fetched Successfully",
+  PRODUCT_CATEGORY: "Products Per Category Fetched Successfully",
+};
 
 export const errorMessages = {
   // Zann - Admin View Products
-  CREATE_PRODUCT: 'Error Creating Product',
-  DELETE_PRODUCT: 'Error Deleting Product',
-  UPDATE_PRODUCT: 'Error Updating Product',
+  CREATE_PRODUCT: "Error Creating Product",
+  DELETE_PRODUCT: "Error Deleting Product",
+  UPDATE_PRODUCT: "Error Updating Product",
 
   // Krista - Product
-  GET_PRODUCT: 'Error Fetching All Products',
-  GET_SINGLE_PRODUCT: 'Error Fetching Single Product',
-  PRODUCT_PHOTO: 'Error Fetching Product Photo',
-  PRODUCT_FILTER: 'Error Filtering Products',
-  PRODUCT_COUNT: 'Error Counting Products',
-  PRODUCT_LIST: 'Error Listing Products',
-  SEARCH_PRODUCT: 'Error In Search Product API',
-  RELATED_PRODUCT: 'Error Fetching Related Products',
-  PRODUCT_CATEGORY: 'Error Fetching Products Per Category',
-}
+  GET_PRODUCT: "Error Fetching All Products",
+  GET_SINGLE_PRODUCT: "Error Fetching Single Product",
+  PRODUCT_PHOTO: "Error Fetching Product Photo",
+  PRODUCT_FILTER: "Error Filtering Products",
+  PRODUCT_COUNT: "Error Counting Products",
+  PRODUCT_LIST: "Error Listing Products",
+  SEARCH_PRODUCT: "Error In Search Product API",
+  RELATED_PRODUCT: "Error Fetching Related Products",
+  PRODUCT_CATEGORY: "Error Fetching Products Per Category",
+};
 
 // Payment Gateway
 var gateway = new braintree.BraintreeGateway({
@@ -79,9 +79,7 @@ export const createProductController = async (req, res) => {
       case !quantity:
         return res.status(500).send({ error: fieldMessages.QUANTITY });
       case photo && photo.size > 1000000:
-        return res
-          .status(500)
-          .send({ error: fieldMessages.PHOTO });
+        return res.status(500).send({ error: fieldMessages.PHOTO });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -207,9 +205,7 @@ export const updateProductController = async (req, res) => {
       case !quantity:
         return res.status(500).send({ error: fieldMessages.QUANTITY });
       case photo && photo.size > 1000000:
-        return res
-          .status(500)
-          .send({ error: fieldMessages.PHOTO });
+        return res.status(500).send({ error: fieldMessages.PHOTO });
     }
 
     const products = await productModel.findByIdAndUpdate(
@@ -388,6 +384,7 @@ export const braintreeTokenController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    res.status(500).send({ error: "Failed to generate token" });
   }
 };
 
@@ -395,6 +392,11 @@ export const braintreeTokenController = async (req, res) => {
 export const brainTreePaymentController = async (req, res) => {
   try {
     const { nonce, cart } = req.body;
+
+    if (!req.user?._id) {
+      return res.status(401).send({ error: "User not authenticated" });
+    }
+
     const total = (Array.isArray(cart) ? cart : []).reduce((sum, item) => {
       const n = Number(item?.price);
       return sum + (Number.isFinite(n) ? n : 0);

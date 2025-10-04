@@ -96,11 +96,11 @@ describe("HomePage", () => {
     expect(screen.getByText("$15.00")).toBeInTheDocument();
   });
 
-  it("should append new products when clicking Loadmore", async () => {
+  it("should append new products when clicking Load more", async () => {
     renderHomePrimed(listPage2); // 5th GET
     await screen.findByText("Alpha");
 
-    fireEvent.click(screen.getByRole("button", { name: /loadmore/i }));
+    fireEvent.click(screen.getByRole("button", { name: /load more/i }));
 
     expect(await screen.findByText("Gamma")).toBeInTheDocument();
     expect(screen.getByText("Alpha")).toBeInTheDocument();
@@ -185,7 +185,7 @@ describe("HomePage", () => {
     expect(await screen.findByText("Refetched")).toBeInTheDocument();
   });
 
-  it("should keep UI stable and hide Loadmore when mount GETs all fail", async () => {
+  it("should keep UI stable and hide Load more when mount GETs all fail", async () => {
     axios.get.mockReset();
     axios.get
       .mockRejectedValueOnce(new Error("cat fail"))
@@ -197,7 +197,7 @@ describe("HomePage", () => {
 
     expect(await screen.findByTestId("layout")).toBeInTheDocument();
     expect(screen.getByText(/all products/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /loadmore/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /load more/i })).not.toBeInTheDocument();
   });
 
   it("should show 'Loading ...' while fetching page 2 and then render the new items", async () => {
@@ -209,7 +209,7 @@ describe("HomePage", () => {
     axios.get.mockResolvedValueOnce(delayed);
 
     await screen.findByText("Alpha");
-    const loadBtn = screen.getByRole("button", { name: /loadmore/i });
+    const loadBtn = screen.getByRole("button", { name: /load more/i });
     fireEvent.click(loadBtn);
 
     expect(loadBtn).toBeDisabled();
@@ -256,8 +256,8 @@ describe("HomePage", () => {
     // No card titles present
     expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
     expect(screen.queryByText("Beta")).not.toBeInTheDocument();
-    // And since products=[], Loadmore should not show (products.length < total could be true,
+    // And since products=[], Load more should not show (products.length < total could be true,
     // but with empty list and no subsequent appends, the button is not rendered by your UI)
-    expect(screen.queryByRole("button", { name: /loadmore/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /load more/i })).not.toBeInTheDocument();
   });
 });
