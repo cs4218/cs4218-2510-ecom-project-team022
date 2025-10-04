@@ -201,9 +201,122 @@ describe('updateCategoryController', () => {
     });
 });
 
-// Yijing - categoryControlller
+// Yi Jing - categoryControlller
+describe('categoryController', () => {
+  let req;
+  let res;
+  let logSpy;
 
-// Yijing - singleCategoryController
+  beforeEach(() => {
+    req = {};
+    res = mockResponse();
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  test('successfully fetches all categories', async () => {
+    const mockCategories = [
+      { _id: '1', name: 'Electronics', slug: 'electronics' },
+      { _id: '2', name: 'Books', slug: 'books' },
+    ];
+
+    categoryModel.find.mockResolvedValue(mockCategories);
+
+    await categoryControllers.categoryControlller(req, res);
+
+    expect(categoryModel.find).toHaveBeenCalledWith({});
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        message: categoryControllers.successMessages.GET_ALL_CATEGORIES,
+        category: mockCategories,
+      })
+    );
+  });
+
+  test('handles error properly', async () => {
+    const errorMessage = "Database fetch error";
+    const mockError = new Error(errorMessage);
+    categoryModel.find.mockRejectedValueOnce(mockError);
+
+    await categoryControllers.categoryControlller(req, res);
+
+    expect(logSpy).toHaveBeenCalled();
+    expect(logSpy.mock.calls[0][0]).toBe(mockError);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        message: categoryControllers.errorMessages.GET_ALL_CATEGORIES,
+        error: mockError,
+      })
+    );
+  });
+});
+
+
+// Yi Jing - singleCategoryController
+describe('singleCategoryController', () => {
+  let req;
+  let res;
+  let logSpy;
+
+  beforeEach(() => {
+    res = mockResponse();
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  test('successfully fetches a single category by slug', async () => {
+    const mockCategory = { _id: '1', name: 'Books', slug: 'books' };
+    const req = { params: { slug: 'books' } };
+
+    categoryModel.findOne.mockResolvedValue(mockCategory);
+
+    await categoryControllers.singleCategoryController(req, res);
+
+    expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: 'books' });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        message: categoryControllers.successMessages.GET_SINGLE_CATEGORY,
+        category: mockCategory,
+      })
+    );
+  });
+
+  test('handles error properly', async () => {
+    const errorMessage = "Something went wrong fetching category";
+    const mockError = new Error(errorMessage);
+    const req = { params: { slug: 'invalid' } };
+
+    categoryModel.findOne.mockRejectedValueOnce(mockError);
+
+    await categoryControllers.singleCategoryController(req, res);
+
+    expect(logSpy).toHaveBeenCalled();
+    expect(logSpy.mock.calls[0][0]).toBe(mockError);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        message: categoryControllers.errorMessages.GET_SINGLE_CATEGORY,
+        error: mockError,
+      })
+    );
+  });
+});
+
 
 // Zann - deleteCategoryController
 describe('deleteCategoryController', () => {
