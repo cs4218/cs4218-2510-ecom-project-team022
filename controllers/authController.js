@@ -179,23 +179,17 @@ export const testController = (req, res) => {
 };
 
 //update profile
+//update profile
 export const updateProfileController = async (req, res) => {
   try {
     const { name, email, password, address, phone } = req.body;
     const user = await userModel.findById(req.user._id);
     //password
-    if (!password) {
-      return res.status(400).send({
-        error: "Password is required",
-      });
+    if (password && password.length < 6) {
+      return res
+        .status(400)
+        .send({ error: "Password is required and at least 6 characters long" });
     }
-
-    if (password.length < 6) {
-      return res.status(400).send({
-        error: PASSWORD_TOO_SHORT,
-      });
-    }
-
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,

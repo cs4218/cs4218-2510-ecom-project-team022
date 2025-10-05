@@ -3,10 +3,17 @@ import {
   getOrdersController,
   getAllOrdersController,
   orderStatusController,
+  forgotPasswordController,
+  loginController,
+  registerController,
 } from "../controllers/authController.js";
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
 import { hashPassword } from "../helpers/authHelper.js";
+
+import JWT from "jsonwebtoken";
+
+import * as authHelper from "../helpers/authHelper.js";
 
 // Mock dependencies
 jest.mock("../models/userModel.js");
@@ -42,8 +49,9 @@ describe("authController unit tests (happy + error paths)", () => {
 
       await updateProfileController(req, res);
 
-      expect(res.json).toHaveBeenCalledWith({
-        error: "Passsword is required and 6 character long",
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.send).toHaveBeenCalledWith({
+        error: "Password is required and at least 6 characters long",
       });
     });
 
@@ -263,17 +271,6 @@ describe("authController unit tests (happy + error paths)", () => {
   });
 });
 
-import { forgotPasswordController } from "./authController.js";
-
-import { updateProfileController } from "./authController.js";
-
-import { loginController } from "./authController.js";
-import JWT from "jsonwebtoken";
-
-import { registerController } from "./authController.js";
-import userModel from "../models/userModel.js";
-import * as authHelper from "../helpers/authHelper.js";
-
 jest.mock("jsonwebtoken");
 
 jest.mock("../models/userModel.js");
@@ -298,7 +295,7 @@ describe("forgotPasswordController", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining("Emai is required"),
+        message: expect.stringContaining("Email is required"),
       })
     );
   });
@@ -360,13 +357,6 @@ describe("forgotPasswordController", () => {
     );
   });
 });
-
-import { loginController } from "./authController.js";
-import JWT from "jsonwebtoken";
-
-import { registerController } from "./authController.js";
-import userModel from "../models/userModel.js";
-import * as authHelper from "../helpers/authHelper.js";
 
 jest.mock("jsonwebtoken");
 
