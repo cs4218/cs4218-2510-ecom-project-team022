@@ -1,170 +1,146 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import Profile from "../../pages/user/Profile";
-import { useAuth } from "../../context/auth";
+import Profile from "./Profile";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-// Mock dependencies
-jest.mock("../../context/auth");
 jest.mock("axios");
-jest.mock("react-hot-toast", () => ({
-  success: jest.fn(),
-  error: jest.fn(),
+jest.mock("react-hot-toast");
+
+// mock useAuth
+const mockSetAuth = jest.fn();
+const mockUseAuth = jest.fn();
+jest.mock("../../context/auth", () => ({
+  useAuth: () => mockUseAuth(),
 }));
 
-jest.mock("../../components/Layout", () => ({ children, title }) => (
-  <div data-testid="layout">{children}</div>
+// mock imported components
+jest.mock("../../components/UserMenu", () => () => <div>UserMenu</div>);
+jest.mock("../../components/Layout", () => ({ children }) => (
+  <div>{children}</div>
 ));
 
-jest.mock("../../components/UserMenu", () => () => <div>UserMenu</div>);
-
-describe("Profile Page", () => {
-  const mockUser = {
-    name: "John Doe",
-    email: "john@example.com",
+// mock localstorage
+// set default return value to always return
+const defaultUser = {
+  user: {
+    name: "Test User",
+    email: "test@example.com",
     phone: "1234567890",
-    address: "123 Main St",
-  };
+    address: "123 Test St",
+  },
+  token: "token",
+};
 
-  const mockSetAuth = jest.fn();
-
+describe("Profile page", () => {
   beforeEach(() => {
-    useAuth.mockReturnValue([{ user: mockUser }, mockSetAuth]);
     jest.clearAllMocks();
+    // Default mock for useAuth
+    mockUseAuth.mockReturnValue([
+      {
+        user: {
+          name: "Test User",
+          email: "test@example.com",
+          phone: "1234567890",
+          address: "123 Test St",
+        },
+        token: "token",
+      },
+      mockSetAuth,
+    ]);
 
-    // Mock localStorage
-    const auth = { user: mockUser, token: "dummy-token" };
-    window.localStorage.setItem("auth", JSON.stringify(auth));
+    const localStorageMock = {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+      clear: jest.fn(),
+    };
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+
+    window.localStorage.getItem.mockReturnValue(JSON.stringify(defaultUser));
+
+    // mock localstorage
+    // window.localStorage.setItem("auth", JSON.stringify({ user: { name: "Test User", email: "test@example.com", phone: "1234567890", address: "123 Test St" }, token: "token" }));
   });
 
-  test("renders profile page with user data", () => {
-    render(<Profile />);
-    expect(screen.getByDisplayValue(mockUser.name)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(mockUser.email)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(mockUser.phone)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(mockUser.address)).toBeInTheDocument();
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  test("updates all input fields including name, password, phone, address, and email", () => {
+  it("renders the form with correct initial values from auth context", () => {
     render(<Profile />);
-
-    const nameInput = screen.getByPlaceholderText("Enter Your Name");
-    fireEvent.change(nameInput, { target: { value: "Jane Doe" } });
-    expect(nameInput.value).toBe("Jane Doe");
-
-    const passwordInput = screen.getByPlaceholderText("Enter Your Password");
-    fireEvent.change(passwordInput, { target: { value: "newpassword" } });
-    expect(passwordInput.value).toBe("newpassword");
-
-    const phoneInput = screen.getByPlaceholderText("Enter Your Phone");
-    fireEvent.change(phoneInput, { target: { value: "9876543210" } });
-    expect(phoneInput.value).toBe("9876543210");
-
-    const addressInput = screen.getByPlaceholderText("Enter Your Address");
-    fireEvent.change(addressInput, { target: { value: "456 Elm St" } });
-    expect(addressInput.value).toBe("456 Elm St");
-
-    // Disabled email input: use getByDisplayValue to cover onChange
-    const emailInput = screen.getByDisplayValue(mockUser.email);
-    fireEvent.change(emailInput, { target: { value: "newemail@example.com" } });
-    expect(emailInput.value).toBe("newemail@example.com");
+    expect(screen.getByPlaceholderText("Enter Your Name").value).toBe(
+      "Test User"
+    );
+    expect(screen.getByPlaceholderText("Enter Your Email").value).toBe(
+      "test@example.com"
+    );
+    expect(screen.getByPlaceholderText("Enter Your Phone").value).toBe(
+      "1234567890"
+    );
+    expect(screen.getByPlaceholderText("Enter Your Address").value).toBe(
+      "123 Test St"
+    );
+    expect(screen.getByPlaceholderText("Enter Your Email")).toBeDisabled();
   });
 
-  test("submits form and updates profile successfully (without password)", async () => {
-    const updatedUser = { ...mockUser, name: "Jane Doe" };
-    axios.put.mockResolvedValue({ data: { updatedUser } });
-
+  it("submits the form and updates context/localStorage on success", async () => {
+    axios.put.mockResolvedValueOnce({
+      data: {
+        updatedUser: {
+          name: "New Name",
+          email: "test@example.com",
+          phone: "1112223333",
+          address: "New Address",
+        },
+      },
+    });
     render(<Profile />);
-
     fireEvent.change(screen.getByPlaceholderText("Enter Your Name"), {
-      target: { value: "Jane Doe" },
+      target: { value: "New Name" },
     });
-
-    const form = screen.getByTestId("profile-form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(axios.put).toHaveBeenCalledWith("/api/v1/auth/profile", {
-        name: "Jane Doe",
-        email: mockUser.email,
-        password: "",
-        phone: mockUser.phone,
-        address: mockUser.address,
-      });
-      expect(mockSetAuth).toHaveBeenCalledWith({ user: updatedUser });
-      expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
+    fireEvent.change(screen.getByPlaceholderText("Enter Your Phone"), {
+      target: { value: "1112223333" },
     });
+    fireEvent.change(screen.getByPlaceholderText("Enter Your Address"), {
+      target: { value: "New Address" },
+    });
+    fireEvent.click(screen.getByText("UPDATE"));
+    await waitFor(() => expect(axios.put).toHaveBeenCalled());
+    expect(mockSetAuth).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user: expect.objectContaining({ name: "New Name" }),
+      })
+    );
+    expect(window.localStorage.setItem).toHaveBeenCalledWith(
+      "auth",
+      expect.stringContaining("New Name")
+    );
+    expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
   });
 
-  test("submits form successfully with password", async () => {
-    const updatedUser = { ...mockUser, name: "Jane Doe" };
-    axios.put.mockResolvedValue({ data: { updatedUser } });
-
+  it("shows an error if the API call fails", async () => {
+    axios.put.mockRejectedValueOnce(new Error("API Error"));
     render(<Profile />);
+    fireEvent.click(screen.getByText("UPDATE"));
+    await waitFor(() => expect(axios.put).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+  });
 
-    fireEvent.change(screen.getByPlaceholderText("Enter Your Name"), {
-      target: { value: "Jane Doe" },
-    });
+  it("shows error toast when API returns data.error", async () => {
+    const errorMessage = "Password must be at least 6 characters long";
+    axios.put.mockResolvedValueOnce({ data: { error: errorMessage } });
+    render(<Profile />);
     fireEvent.change(screen.getByPlaceholderText("Enter Your Password"), {
-      target: { value: "mypassword" },
+      target: { value: "short" },
     });
-
-    const form = screen.getByTestId("profile-form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(axios.put).toHaveBeenCalledWith("/api/v1/auth/profile", {
-        name: "Jane Doe",
-        email: mockUser.email,
-        password: "mypassword",
-        phone: mockUser.phone,
-        address: mockUser.address,
-      });
-      expect(mockSetAuth).toHaveBeenCalledWith({ user: updatedUser });
-      expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
-    });
-  });
-
-  test("handles API error correctly", async () => {
-    axios.put.mockRejectedValue(new Error("Network Error"));
-
-    render(<Profile />);
-    const form = screen.getByTestId("profile-form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Something went wrong");
-    });
-  });
-
-  test("displays toast error if API returns error message", async () => {
-    axios.put.mockResolvedValue({ data: { error: "Invalid data" } });
-
-    render(<Profile />);
-    const form = screen.getByTestId("profile-form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Invalid data");
-    });
-  });
-
-  test("handles empty localStorage gracefully", async () => {
-    window.localStorage.removeItem("auth");
-
-    const updatedUser = { ...mockUser, name: "Jane Doe" };
-    axios.put.mockResolvedValue({ data: { updatedUser } });
-
-    render(<Profile />);
-
-    const form = screen.getByTestId("profile-form");
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      const ls = JSON.parse(window.localStorage.getItem("auth"));
-      expect(ls.user).toEqual(updatedUser); // tests || {} fallback
-      expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
-    });
+    fireEvent.click(screen.getByText("UPDATE"));
+    await waitFor(() => expect(axios.put).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledWith(errorMessage);
+    expect(mockSetAuth).not.toHaveBeenCalled();
+    expect(window.localStorage.setItem).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });

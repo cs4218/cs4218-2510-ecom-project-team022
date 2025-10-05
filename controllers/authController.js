@@ -4,27 +4,33 @@ import orderModel from "../models/orderModel.js";
 import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
 
+const PASSWORD_TOO_SHORT = "Password must be at least 6 characters long";
+
 export const registerController = async (req, res) => {
   try {
     const { name, email, password, phone, address, answer } = req.body;
     //validations
     if (!name) {
-      return res.send({ error: "Name is Required" });
+      return res.status(400).send({ error: "Name is Required" });
     }
     if (!email) {
-      return res.send({ message: "Email is Required" });
+      return res.status(400).send({ message: "Email is Required" });
     }
     if (!password) {
-      return res.send({ message: "Password is Required" });
+      return res.status(400).send({ message: "Password is Required" });
     }
     if (!phone) {
-      return res.send({ message: "Phone no is Required" });
+      return res.status(400).send({ message: "Phone no is Required" });
     }
     if (!address) {
-      return res.send({ message: "Address is Required" });
+      return res.status(400).send({ message: "Address is Required" });
     }
     if (!answer) {
-      return res.send({ message: "Answer is Required" });
+      return res.status(400).send({ message: "Answer is Required" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).send({ message: PASSWORD_TOO_SHORT });
     }
     //check user
     const exisitingUser = await userModel.findOne({ email });
@@ -121,14 +127,22 @@ export const forgotPasswordController = async (req, res) => {
   try {
     const { email, answer, newPassword } = req.body;
     if (!email) {
-      res.status(400).send({ message: "Emai is required" });
+      res.status(400).send({ message: "Email is required" });
+      return;
     }
     if (!answer) {
       res.status(400).send({ message: "answer is required" });
+      return;
     }
     if (!newPassword) {
       res.status(400).send({ message: "New Password is required" });
+      return;
     }
+
+    if (newPassword && newPassword.length < 6) {
+      return res.status(400).send({ message: PASSWORD_TOO_SHORT });
+    }
+
     //check
     const user = await userModel.findOne({ email, answer });
     //validation
@@ -165,13 +179,16 @@ export const testController = (req, res) => {
 };
 
 //update profile
+//update profile
 export const updateProfileController = async (req, res) => {
   try {
     const { name, email, password, address, phone } = req.body;
     const user = await userModel.findById(req.user._id);
     //password
     if (password && password.length < 6) {
-      return res.json({ error: "Passsword is required and 6 character long" });
+      return res
+        .status(400)
+        .send({ error: "Password is required and at least 6 characters long" });
     }
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
@@ -259,7 +276,7 @@ export const orderStatusController = async (req, res) => {
 export const getAllUsersController = async (req, res) => {
   try {
     const users = await userModel.find({});
-    res.json({users});
+    res.json({ users });
   } catch (error) {
     console.log(error);
     res.status(500).send({
