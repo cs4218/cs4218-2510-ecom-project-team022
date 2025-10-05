@@ -171,6 +171,12 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 |Feature|Client Related Files (/client/src/)|Server Related Files (./)|
 |---|---|---|
+|Protected Routes  | - context/auth.js | - helpers/authHelper.js <br> - middlewares/authMiddleware.js |
+| Registration | - pages/Auth/Register.js | - controllers/authController.js <br> 1. registerController <br> 2. loginController <br> 3. forgotPasswordController <br> |
+| Login | - pages/Auth/Login.js | (same as above)
+| General | - components/Routes/Private.js <br> - components/UserMenu.js <br> - pages/user/Dashboard.js | - models/userModel.js |
+| Profile | - pages/user/Profile.js | |
+| Admin Actions | - pages/admin/CreateProduct.js <br> - pages/admin/UpdateProduct.js | |
 
 #### Yi Jing
 
