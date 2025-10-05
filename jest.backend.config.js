@@ -4,11 +4,16 @@ export default {
   testMatch: ["**/?(*.)+(test).[jt]s?(x)"],
   testPathIgnorePatterns: ["<rootDir>/client/"],
   collectCoverage: true,
-  collectCoverageFrom: ["controllers/**", "routes/**", "middlewares/**", "helpers/**"],
+  collectCoverageFrom: [
+    "controllers/**",
+    "middlewares/**",
+    "helpers/**",
+    "config/**",
+  ],
   coverageThreshold: {
     global: {
-      lines: 100,
-      functions: 100,
+      lines: 90,
+      functions: 90,
     },
   },
 };

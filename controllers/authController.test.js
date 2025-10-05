@@ -6,6 +6,8 @@ import {
   forgotPasswordController,
   loginController,
   registerController,
+  testController,
+  getAllUsersController,
 } from "../controllers/authController.js";
 import userModel from "../models/userModel.js";
 import orderModel from "../models/orderModel.js";
@@ -322,6 +324,17 @@ describe("forgotPasswordController", () => {
     );
   });
 
+  it("should return 400 if newPassword is too short", async () => {
+    req.body = { email: "a@b.com", answer: "ans", newPassword: "123" };
+    await forgotPasswordController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(PASSWORD_TOO_SHORT),
+      })
+    );
+  });
+
   it("should return 404 if user is not found", async () => {
     req.body = { email: "a@b.com", answer: "ans", newPassword: "123456" };
     userModel.findOne.mockResolvedValue(null);
@@ -569,6 +582,75 @@ describe("registerController", () => {
     );
   });
 
+  // Test individual field validations for registerController
+  it("should fail validation if email is missing", async () => {
+    req.body = {
+      name: "A",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Email is Required"),
+      })
+    );
+  });
+
+  it("should fail validation if phone is missing", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Phone no is Required"),
+      })
+    );
+  });
+
+  it("should fail validation if address is missing", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Address is Required"),
+      })
+    );
+  });
+
+  it("should fail validation if answer is missing", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Answer is Required"),
+      })
+    );
+  });
+
   // missing all fields
   it("should fail validation if required fields are missing", async () => {
     await registerController(req, res);
@@ -634,5 +716,84 @@ describe("registerController", () => {
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({ success: false })
     );
+  });
+});
+
+describe("testController", () => {
+  let req, res;
+  beforeEach(() => {
+    req = {};
+    res = {
+      send: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  it("should return 'Protected Routes' message", () => {
+    testController(req, res);
+    expect(res.send).toHaveBeenCalledWith("Protected Routes");
+  });
+
+  it("should handle errors gracefully", () => {
+    // Mock res.send to throw an error to test the catch block
+    res.send = jest.fn().mockImplementation(() => {
+      throw new Error("Send error");
+    });
+
+    const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    // Wrap in expect to catch the error
+    expect(() => {
+      testController(req, res);
+    }).toThrow("Send error");
+
+    expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
+
+    consoleSpy.mockRestore();
+  });
+});
+
+describe("getAllUsersController", () => {
+  let req, res;
+  beforeEach(() => {
+    req = {};
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  it("should return all users successfully", async () => {
+    const mockUsers = [
+      { _id: "1", name: "User1", email: "user1@test.com" },
+      { _id: "2", name: "User2", email: "user2@test.com" },
+    ];
+    userModel.find.mockResolvedValue(mockUsers);
+
+    await getAllUsersController(req, res);
+
+    expect(userModel.find).toHaveBeenCalledWith({});
+    expect(res.json).toHaveBeenCalledWith({ users: mockUsers });
+  });
+
+  it("should handle database error gracefully", async () => {
+    const error = new Error("Database error");
+    userModel.find.mockRejectedValue(error);
+
+    const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+    await getAllUsersController(req, res);
+
+    expect(consoleSpy).toHaveBeenCalledWith(error);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({
+      success: false,
+      message: "Error While Getting All Users",
+      error,
+    });
+
+    consoleSpy.mockRestore();
   });
 });

@@ -1143,6 +1143,26 @@ describe("brainTreePaymentController", () => {
     logSpy.mockRestore();
   });
 
+  test("Failure: User not authenticated - missing user ID", async () => {
+    req.user = { _id: null }; // or undefined
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ error: "User not authenticated" });
+    expect(orderModel.mockInstance.save).not.toHaveBeenCalled();
+  });
+
+  test("Failure: User not authenticated - missing user object", async () => {
+    req.user = null;
+
+    await productControllers.brainTreePaymentController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({ error: "User not authenticated" });
+    expect(orderModel.mockInstance.save).not.toHaveBeenCalled();
+  });
+
   test("Success: process payment and create order", async () => {
     const mockTransactionResult = {
       success: true,
