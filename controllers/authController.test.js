@@ -387,11 +387,38 @@ describe("loginController", () => {
     jest.clearAllMocks();
   });
 
-  it("should return success: false if email or password is missing", async () => {
+  it("should return success: false if password is missing", async () => {
+    req.body = { email: "a@b.com" };
     await loginController(req, res);
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false })
+      expect.objectContaining({
+        success: false,
+        message: "Invalid email or password",
+      })
+    );
+  });
+
+  it("should return success: false if email is missing", async () => {
+    req.body = { password: "123456" };
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        message: "Invalid email or password",
+      })
+    );
+  });
+
+  it("should return success: false if email and password is missing", async () => {
+    await loginController(req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: false,
+        message: "Invalid email or password",
+      })
     );
   });
 
@@ -401,7 +428,10 @@ describe("loginController", () => {
     await loginController(req, res);
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false })
+      expect.objectContaining({
+        success: false,
+        message: "Email is not registered",
+      })
     );
   });
 
@@ -412,7 +442,7 @@ describe("loginController", () => {
     await loginController(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({ success: false })
+      expect.objectContaining({ success: false, message: "Invalid Password" })
     );
   });
 
