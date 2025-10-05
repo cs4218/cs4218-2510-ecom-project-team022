@@ -187,9 +187,13 @@ The following shows the scope of our individal unit testing and bug fixing.
 |Search| - components/Form/SearchInput.js <br> - context/search.js <br> - pages/Search.js||
 |Category| - hooks/useCategory.js <br> - pages/Categories.js| - controllers/categoryController.js <br>&nbsp;&nbsp;1. categoryControlller <br>&nbsp;&nbsp;2. singleCategoryController <br> - models/categoryModel.js|
 
-
-
-#### Tzu Che
+#### Tzu Che  
 
 |Feature|Client Related Files (/client/src/)|Server Related Files (./)|
 |---|---|---|
+|Contact| - pages/Contact.js | |
+|Policy| - pages/Policy.js | |
+|General| - components/Footer.js <br> - components/Header.js <br> - components/Layout.js <br> - components/Spinner.js <br> - pages/About.js <br> - pages/Pagenotfound.js | - config/db.js |
+|Home| - pages/Homepage.js | |
+|Cart| - context/cart.js <br> - pages/CartPage.js | |
+|Payment| | - controllers/productController.js <br>&nbsp;&nbsp;1. braintreeTokenController <br>&nbsp;&nbsp;2. brainTreePaymentController |
