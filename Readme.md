@@ -179,7 +179,7 @@ The following shows the scope of our individal unit testing and bug fixing.
 |Order| - pages/user/Orders.js| - Controllers/authController.js <br>&nbsp;&nbsp;1. updateProfileController <br>&nbsp;&nbsp;2. getOrdersController <br>&nbsp;&nbsp;3. getAllOrdersController <br>&nbsp;&nbsp;4. orderStatusController <br> - models/orderModel.js|
 |Profile| - pages/user/Profile.js ||
 |Search| - components/Form/SearchInput.js <br> - context/search.js <br> - pages/Search.js||
-|Category| - hooks/useCategory.js - pages/Categories.js| - controllers/categoryController.js <br>&nbsp;&nbsp;1. categoryControlller <br>&nbsp;&nbsp;2. singleCategoryController <br> - models/categoryModel.js|
+|Category| - hooks/useCategory.js <br> - pages/Categories.js| - controllers/categoryController.js <br>&nbsp;&nbsp;1. categoryControlller <br>&nbsp;&nbsp;2. singleCategoryController <br> - models/categoryModel.js|
 
 
 
