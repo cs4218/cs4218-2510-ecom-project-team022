@@ -390,4 +390,70 @@ describe("UpdateProduct", () => {
       expect(screen.queryByText("Upload Photo")).not.toBeInTheDocument();
     });
   });
+
+  describe("Form field interactions", () => {
+    beforeEach(() => {
+      // Mock successful product and category fetch
+      axios.get
+        .mockResolvedValueOnce({
+          data: {
+            success: true,
+            product: {
+              _id: "test-id",
+              name: "Test Product",
+              description: "Test Description",
+              price: 100,
+              quantity: 10,
+              category: { _id: "cat1", name: "Category 1" },
+              shipping: true,
+            },
+          },
+        })
+        .mockResolvedValueOnce({
+          data: {
+            success: true,
+            category: [{ _id: "cat1", name: "Category 1" }],
+          },
+        });
+    });
+
+    it("allows changing description", async () => {
+      const { getByPlaceholderText } = renderUpdateProduct();
+
+      await waitFor(() => getByPlaceholderText("write a description"));
+
+      const descriptionField = getByPlaceholderText("write a description");
+      fireEvent.change(descriptionField, {
+        target: { value: "New description" },
+      });
+
+      expect(descriptionField.value).toBe("New description");
+    });
+
+    it("allows changing price", async () => {
+      const { getByPlaceholderText } = renderUpdateProduct();
+
+      await waitFor(() => getByPlaceholderText("write a Price"));
+
+      const priceField = getByPlaceholderText("write a Price");
+      fireEvent.change(priceField, {
+        target: { value: "200" },
+      });
+
+      expect(priceField.value).toBe("200");
+    });
+
+    it("allows changing quantity", async () => {
+      const { getByPlaceholderText } = renderUpdateProduct();
+
+      await waitFor(() => getByPlaceholderText("write a quantity"));
+
+      const quantityField = getByPlaceholderText("write a quantity");
+      fireEvent.change(quantityField, {
+        target: { value: "25" },
+      });
+
+      expect(quantityField.value).toBe("25");
+    });
+  });
 });

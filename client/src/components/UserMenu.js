@@ -9,15 +9,17 @@ const UserMenu = () => {
           <NavLink
             to="/dashboard/user/profile"
             className="list-group-item list-group-item-action"
+            data-testid="profile-link"
           >
             Profile
           </NavLink>
           <NavLink
             to="/dashboard/user/orders"
             className="list-group-item list-group-item-action"
+            data-testid="orders-link"
           >
             Orders
-          </NavLink>         
+          </NavLink>
         </div>
       </div>
     </div>
