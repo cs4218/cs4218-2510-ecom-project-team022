@@ -4,6 +4,8 @@ import orderModel from "../models/orderModel.js";
 import { comparePassword, hashPassword } from "./../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
 
+const PASSWORD_TOO_SHORT = "Password must be at least 6 characters long";
+
 export const registerController = async (req, res) => {
   try {
     const { name, email, password, phone, address, answer } = req.body;
@@ -25,6 +27,10 @@ export const registerController = async (req, res) => {
     }
     if (!answer) {
       return res.status(400).send({ message: "Answer is Required" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).send({ message: PASSWORD_TOO_SHORT });
     }
     //check user
     const exisitingUser = await userModel.findOne({ email });
@@ -121,14 +127,22 @@ export const forgotPasswordController = async (req, res) => {
   try {
     const { email, answer, newPassword } = req.body;
     if (!email) {
-      res.status(400).send({ message: "Emai is required" });
+      res.status(400).send({ message: "Email is required" });
+      return;
     }
     if (!answer) {
       res.status(400).send({ message: "answer is required" });
+      return;
     }
     if (!newPassword) {
       res.status(400).send({ message: "New Password is required" });
+      return;
     }
+
+    if (newPassword && newPassword.length < 6) {
+      return res.status(400).send({ message: PASSWORD_TOO_SHORT });
+    }
+
     //check
     const user = await userModel.findOne({ email, answer });
     //validation
@@ -170,9 +184,18 @@ export const updateProfileController = async (req, res) => {
     const { name, email, password, address, phone } = req.body;
     const user = await userModel.findById(req.user._id);
     //password
-    if (password && password.length < 6) {
-      return res.json({ error: "Passsword is required and 6 character long" });
+    if (!password) {
+      return res.status(400).send({
+        error: "Password is required",
+      });
     }
+
+    if (password.length < 6) {
+      return res.status(400).send({
+        error: PASSWORD_TOO_SHORT,
+      });
+    }
+
     const hashedPassword = password ? await hashPassword(password) : undefined;
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user._id,
@@ -259,7 +282,7 @@ export const orderStatusController = async (req, res) => {
 export const getAllUsersController = async (req, res) => {
   try {
     const users = await userModel.find({});
-    res.json({users});
+    res.json({ users });
   } catch (error) {
     console.log(error);
     res.status(500).send({

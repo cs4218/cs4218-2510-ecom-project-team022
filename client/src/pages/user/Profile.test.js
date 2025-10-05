@@ -128,4 +128,19 @@ describe("Profile page", () => {
     await waitFor(() => expect(axios.put).toHaveBeenCalled());
     expect(toast.error).toHaveBeenCalledWith("Something went wrong");
   });
+
+  it("shows error toast when API returns data.error", async () => {
+    const errorMessage = "Password must be at least 6 characters long";
+    axios.put.mockResolvedValueOnce({ data: { error: errorMessage } });
+    render(<Profile />);
+    fireEvent.change(screen.getByPlaceholderText("Enter Your Password"), {
+      target: { value: "short" },
+    });
+    fireEvent.click(screen.getByText("UPDATE"));
+    await waitFor(() => expect(axios.put).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenCalledWith(errorMessage);
+    expect(mockSetAuth).not.toHaveBeenCalled();
+    expect(window.localStorage.setItem).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+  });
 });

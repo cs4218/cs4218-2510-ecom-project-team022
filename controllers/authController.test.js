@@ -264,6 +264,23 @@ describe("authController unit tests (happy + error paths)", () => {
 });
 
 import { forgotPasswordController } from "./authController.js";
+
+import { updateProfileController } from "./authController.js";
+
+import { loginController } from "./authController.js";
+import JWT from "jsonwebtoken";
+
+import { registerController } from "./authController.js";
+import userModel from "../models/userModel.js";
+import * as authHelper from "../helpers/authHelper.js";
+
+jest.mock("jsonwebtoken");
+
+jest.mock("../models/userModel.js");
+jest.mock("../helpers/authHelper.js");
+
+const PASSWORD_TOO_SHORT = "Password must be at least 6 characters long";
+
 describe("forgotPasswordController", () => {
   let req, res;
   beforeEach(() => {
@@ -444,6 +461,122 @@ describe("registerController", () => {
       send: jest.fn(),
     };
     jest.clearAllMocks();
+  });
+
+  // BVA tests for password length validation in registration
+  // Equivalence Partitions: 0-5 chars (invalid), 6+ chars (valid)
+  // Boundary values: 0, 1, 4, 5, 6, 7
+
+  it("should fail validation if password is 0 characters (empty)", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Password is Required"),
+      })
+    );
+  });
+
+  it("should fail validation if password is 1 character", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "1",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(PASSWORD_TOO_SHORT),
+      })
+    );
+  });
+
+  it("should fail validation if password is 4 characters", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "1234",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(PASSWORD_TOO_SHORT),
+      })
+    );
+  });
+
+  it("should fail validation if password is 5 characters", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "12345",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining(PASSWORD_TOO_SHORT),
+      })
+    );
+  });
+
+  it("should register user successfully if password is exactly 6 characters", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "123456",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    userModel.findOne.mockResolvedValue(null);
+    authHelper.hashPassword.mockResolvedValue("hashed");
+    const saveMock = jest.fn().mockResolvedValue({ _id: "2", name: "A" });
+    userModel.mockImplementation(() => ({ save: saveMock }));
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, user: expect.any(Object) })
+    );
+  });
+
+  it("should register user successfully if password is 7 characters", async () => {
+    req.body = {
+      name: "A",
+      email: "a@b.com",
+      password: "1234567",
+      phone: "123",
+      address: "addr",
+      answer: "ans",
+    };
+    userModel.findOne.mockResolvedValue(null);
+    authHelper.hashPassword.mockResolvedValue("hashed");
+    const saveMock = jest.fn().mockResolvedValue({ _id: "2", name: "A" });
+    userModel.mockImplementation(() => ({ save: saveMock }));
+    await registerController(req, res);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.send).toHaveBeenCalledWith(
+      expect.objectContaining({ success: true, user: expect.any(Object) })
+    );
   });
 
   // missing all fields
