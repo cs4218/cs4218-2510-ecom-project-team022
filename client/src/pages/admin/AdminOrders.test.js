@@ -112,7 +112,7 @@ describe("Admin Orders", () => {
         });
 
         expect(logSpy).toHaveBeenCalled();
-        expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
+        expect(logSpy.mock.calls[1][0].message).toBe(errorMessage);
     });
 
     //The following test is created with the help of AI
@@ -159,6 +159,6 @@ describe("Admin Orders", () => {
             fireEvent.change(selectSecondOrder, { target: { value: "Shipped" } });
         }); 
         expect(logSpy).toHaveBeenCalled();
-        expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
+        expect(logSpy.mock.calls[1][0].message).toBe(errorMessage);
     });
 });
