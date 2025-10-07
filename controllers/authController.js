@@ -223,7 +223,7 @@ export const getAllOrdersController = async (req, res) => {
       .find({})
       .populate("products", "-photo")
       .populate("buyer", "name")
-      .sort({ createdAt: "-1" });
+      .sort({ createdAt: -1 }); //Edited by Zann, to fix issue in Admin View Orders
     res.json(orders);
   } catch (error) {
     console.log(error);

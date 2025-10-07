@@ -26,11 +26,13 @@ const AdminOrders = () => {
       setOrders(data);
     } catch (error) {
       console.log(error);
-      //BUG: did not add toast error, not implemented yet
+      //BUG: added toast error message to inform users in the case where there are errors in getting order
+      toast.error("Something went wrong in getting orders");
     }
   };
 
   useEffect(() => { //get order when tokens are present
+    console.log("Auth Token: ", auth?.token); //Added to check auth token
     if (auth?.token) getOrders();
   }, [auth?.token]);
 
