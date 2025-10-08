@@ -56,7 +56,7 @@ const mockMultipleOrders = [
   },
 ];
 
-describe("Admin Orders", () => {
+describe("Admin Orders - Unit Test", () => {
     beforeEach(() => {
         logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
         jest.clearAllMocks();

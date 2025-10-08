@@ -14,7 +14,7 @@ const AdminOrders = () => {
     "Processing",
     "Shipped",
     "Delivered", //BUG: standardised spelling from "deliverd"
-    "Cancel", //BUG: standardised spelling from "cancel"
+    "Cancelled", //BUG: standardised spelling from "cancel"
   ]);
   const [changeStatus, setChangeStatus] = useState(""); //BUG: change from "setCHangeStatus"
   const [orders, setOrders] = useState([]);
@@ -44,7 +44,7 @@ const AdminOrders = () => {
       getOrders();
     } catch (error) {
       console.log(error);
-      //BUG: did not add toast error, not implemented yet
+      toast.error("Something went wrong in handling change");
     }
   };
 
@@ -77,6 +77,7 @@ const AdminOrders = () => {
                       <td>
                         <Select
                           bordered={false}
+                          data-testid={`status-${o._id}`}
                           onChange={(value) => handleChange(o._id, value)}
                           defaultValue={o?.status}
                         >
