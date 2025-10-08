@@ -35,7 +35,7 @@ const mockMultipleUsers = [
   },
 ];
 
-describe("Users", () => {
+describe("Users Unit Testing", () => {
   beforeEach(() => {
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
     jest.clearAllMocks();
