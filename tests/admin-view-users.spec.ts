@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 test.describe('Admin View Users', () => {
     //need ensure that there is an admin (admin@gmail.com, adminpw) before running test
     test('Admin login -> click dashboard -> click Users -> verify admin is in user list', async ({ page }) => {
-        await page.goto('http://localhost:3000');
+        await page.goto('http://localhost:3000/login');
         //admin login 
         await page.getByRole('link', { name: 'Login' }).click();
         await page.getByRole('textbox', { name: 'Enter Your Email' }).fill('admin@gmail.com');
@@ -39,7 +39,7 @@ test.describe('Admin View Users', () => {
 
     //need ensure that there is an admin (admin@gmail.com, adminpw) and does not have any user before running test
    test('Admin login and verify only admin -> user registers -> admin check that user is in user list', async ({ page }) => {
-       await page.goto('http://localhost:3000');
+       await page.goto('http://localhost:3000/login');
        //admin login
        await page.getByRole('link', { name: 'Login' }).click();
        await page.getByRole('textbox', { name: 'Enter Your Email' }).click();
@@ -77,7 +77,7 @@ test.describe('Admin View Users', () => {
        await page.getByRole('textbox', { name: 'What is Your Favorite sports' }).fill('running');
        await page.getByRole('button', { name: 'REGISTER' }).click();
 
-       await page.goto('http://localhost:3000');
+       await page.goto('http://localhost:3000/login');
 
        //admin login again
        await page.getByRole('link', { name: 'Login' }).click();
