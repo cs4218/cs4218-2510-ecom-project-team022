@@ -85,4 +85,24 @@ test.describe('Admin Actions - Category Related', () => {
         await page.getByRole('button', { name: 'Categories' }).click();
         await expect(page.locator('#navbarTogglerDemo01')).toContainText('NewCategoryEdited');
     });
+
+    test('Admin login -> click dashboard -> click Create Category -> delete NewCategoryEdited -> verify NewCategoryEdited deleted', async ({ page }) => {
+        await page.goto('http://localhost:3000/login');
+        //admin login
+        await page.getByRole('textbox', { name: 'Enter Your Email' }).click();
+        await page.getByRole('textbox', { name: 'Enter Your Email' }).fill('admin@gmail.com');
+        await page.getByRole('textbox', { name: 'Enter Your Password' }).click();
+        await page.getByRole('textbox', { name: 'Enter Your Password' }).fill('adminpw');
+        await page.getByRole('button', { name: 'LOGIN' }).click();
+        
+        //admin deletes NewCategoryEdited
+        await page.getByRole('button', { name: 'admin' }).click();
+        await page.getByRole('link', { name: 'Dashboard' }).click();
+        await page.getByRole('link', { name: 'Create Category' }).click();
+        await expect(page.locator('tbody')).toContainText('NewCategoryEdited');
+        await page.getByRole('button', { name: 'Delete' }).nth(3).click();
+
+        //ensure toast message appears
+        await expect(page.getByText('category is deleted')).toBeVisible();
+    });
 });
