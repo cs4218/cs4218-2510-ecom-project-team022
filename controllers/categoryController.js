@@ -38,7 +38,7 @@ export const createCategoryController = async (req, res) => {
     const existingCategory = await categoryModel.findOne({ name });
     if (existingCategory) {
       return res.status(200).send({
-        success: true,
+        success: true, //arguably this can be false also since it is duplicated
         message: successMessages.DUPLICATE_CATEGORY,
       });
     }
