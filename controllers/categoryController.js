@@ -87,7 +87,7 @@ export const updateCategoryController = async (req, res) => {
 };
 
 // Yi Jing - Category - get all categories
-export const categoryControlller = async (req, res) => {
+export const categoryController = async (req, res) => {
   try {
     const category = await categoryModel.find({});
     res.status(200).send({
@@ -99,7 +99,6 @@ export const categoryControlller = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      error,
       message: errorMessages.GET_ALL_CATEGORIES,
     });
   }
@@ -118,7 +117,6 @@ export const singleCategoryController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      error,
       message: errorMessages.GET_SINGLE_CATEGORY,
     });
   }
