@@ -201,7 +201,7 @@ describe('updateCategoryController', () => {
     });
 });
 
-// Yi Jing - categoryControlller
+// Yi Jing - categoryController
 describe('categoryController', () => {
   let req;
   let res;
@@ -226,7 +226,7 @@ describe('categoryController', () => {
 
     categoryModel.find.mockResolvedValue(mockCategories);
 
-    await categoryControllers.categoryControlller(req, res);
+    await categoryControllers.categoryController(req, res);
 
     expect(categoryModel.find).toHaveBeenCalledWith({});
     expect(res.status).toHaveBeenCalledWith(200);
@@ -244,16 +244,18 @@ describe('categoryController', () => {
     const mockError = new Error(errorMessage);
     categoryModel.find.mockRejectedValueOnce(mockError);
 
-    await categoryControllers.categoryControlller(req, res);
+    await categoryControllers.categoryController(req, res);
 
+    // Check that the error was logged internally
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0]).toBe(mockError);
+
+    // Check HTTP response
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
         message: categoryControllers.errorMessages.GET_ALL_CATEGORIES,
-        error: mockError,
       })
     );
   });
@@ -304,14 +306,16 @@ describe('singleCategoryController', () => {
 
     await categoryControllers.singleCategoryController(req, res);
 
+    // Check that the error was logged internally
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0]).toBe(mockError);
+    
+    // Check HTTP response
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
         message: categoryControllers.errorMessages.GET_SINGLE_CATEGORY,
-        error: mockError,
       })
     );
   });

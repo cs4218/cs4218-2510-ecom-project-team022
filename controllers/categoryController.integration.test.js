@@ -11,7 +11,7 @@ app.use(express.json());
 app.post('/api/v1/category/create-category', categoryControllers.createCategoryController);
 app.put('/api/v1/category/update-category/:id', categoryControllers.updateCategoryController);
 app.delete('/api/v1/category/delete-category/:id', categoryControllers.deleteCategoryController);
-app.get('/api/v1/category/get-categories', categoryControllers.categoryControlller); // Get all categories
+app.get('/api/v1/category/get-categories', categoryControllers.categoryController); // Get all categories
 app.get('/api/v1/category/get-category/:slug', categoryControllers.singleCategoryController); // Get single category by slug
 
 let mongoServer;
@@ -118,7 +118,7 @@ describe('getAllCategoriesController, singleCategoryController', () => {
     expect(res.body.message).toBe(categoryControllers.errorMessages.GET_ALL_CATEGORIES);
     expect(res.body).not.toHaveProperty('category'); // no category field returned
   });
-  
+
   // Non-existent slug → still returns 200 with null category
   test('returns 200 with null category if slug not found', async () => {
     const res = await request(app).get('/api/v1/category/get-category/nonexistent-slug');

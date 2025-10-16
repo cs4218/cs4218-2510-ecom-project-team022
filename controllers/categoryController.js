@@ -87,7 +87,7 @@ export const updateCategoryController = async (req, res) => {
 };
 
 // Yi Jing - Category - get all categories
-export const categoryControlller = async (req, res) => {
+export const categoryController = async (req, res) => {
   try {
     const category = await categoryModel.find({});
     res.status(200).send({
