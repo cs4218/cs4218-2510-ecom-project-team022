@@ -198,3 +198,82 @@ The following shows the scope of our individal unit testing and bug fixing.
 |Home| - pages/Homepage.js | |
 |Cart| - context/cart.js <br> - pages/CartPage.js | |
 |Payment| | - controllers/productController.js <br>&nbsp;&nbsp;1. braintreeTokenController <br>&nbsp;&nbsp;2. brainTreePaymentController |
+
+## Milestone 2
+
+### 1. Members' Contributions - Integration Testing and Bug Fixing
+
+#### Krista
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Admin Dashboard| - components/AdminMenu.js <br> - pages/admin/AdminDashboard.js | |
+|Product| - pages/productDetails.js <br> - pages/categoryProduct.js | - controllers/productController.js <br> 1. getProductController <br> 2. getSingleProductController <br> 3. productPhotoController <br> 4. productFiltersController <br> 5. productCountController <br> 6. productListController <br> 7. searchProductController <br> 8. relatedProductController <br> 9. productCategoryController <br> - models/ProductModel.js|
+
+#### Zann
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Admin Actions| - components/Form/CategoryForm.js <br> - pages/admin/CreateCategory.js| - controllers/categoryController.js <br> 1. createCategoryController <br> 2. updateCategoryController <br> 3. deleteCategoryController|
+|Admin View Orders| - pages/admin/AdminOrders.js||
+|Admin View Products| - pages/admin/Products.js| - controllers/productController.js <br> 1. createProductController <br> 2. deleteProductController <br> 3. updateProductController|
+|Admin View Users| - pages/admin/Users.js||
+
+#### Marcus
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Protected Routes  | - context/auth.js | - helpers/authHelper.js <br> - middlewares/authMiddleware.js |
+| Registration | - pages/Auth/Register.js | - controllers/authController.js <br> 1. registerController <br> 2. loginController <br> 3. forgotPasswordController <br> |
+| Login | - pages/Auth/Login.js | (same as above)
+| General | - components/Routes/Private.js <br> - components/UserMenu.js <br> - pages/user/Dashboard.js | - models/userModel.js |
+| Profile | - pages/user/Profile.js | |
+| Admin Actions | - pages/admin/CreateProduct.js <br> - pages/admin/UpdateProduct.js | |
+
+#### Yi Jing
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Order| - pages/user/Orders.js| - Controllers/authController.js <br>&nbsp;&nbsp;1. updateProfileController <br>&nbsp;&nbsp;2. getOrdersController <br>&nbsp;&nbsp;3. getAllOrdersController <br>&nbsp;&nbsp;4. orderStatusController <br> - models/orderModel.js|
+|Search| - components/Form/SearchInput.js <br> - context/search.js <br> - pages/Search.js||
+|Category| - hooks/useCategory.js <br> - pages/Categories.js| - controllers/categoryController.js <br>&nbsp;&nbsp;1. categoryControlller <br>&nbsp;&nbsp;2. singleCategoryController <br> - models/categoryModel.js|
+
+#### Tzu Che  
+
+|Feature|Client Related Files (/client/src/)|Server Related Files (./)|
+|---|---|---|
+|Contact| - pages/Contact.js | |
+|Policy| - pages/Policy.js | |
+|General| - components/Footer.js <br> - components/Header.js <br> - components/Layout.js <br> - components/Spinner.js <br> - pages/About.js <br> - pages/Pagenotfound.js | - config/db.js |
+|Home| - pages/Homepage.js | |
+|Cart| - context/cart.js <br> - pages/CartPage.js | |
+|Payment| | - controllers/productController.js <br>&nbsp;&nbsp;1. braintreeTokenController <br>&nbsp;&nbsp;2. brainTreePaymentController |
+
+
+### 2. Members' Contributions - UI Testing 
+
+#### Krista
+
+#### Zann
+##### Admin View Users
+- Admin login -> navigates to dashboard -> click Users -> verifies that admin appears in the user list
+- Admin login and finds no user -> a new user registers -> admin refreshes and verifies that the new user is in user list
+##### Admin Actions - Category (Admin login -> navigates to dashboard -> click Create Category)
+- Admin creates a blank Category -> verify that category not created and error message appears
+- Admin creates a valid new Category -> verify category created successfully
+- Admin edits an existing Category -> verify category edited successfully
+- Admin deletes an existing Category -> verify category deleted successfully
+##### Admin Actions - Products (Admin login -> navigates to dashboard -> click Create Product )
+- Admin creates a blank Product -> verify that product not created and error message appears
+- Admin creates a valid Product -> verify product created successfully
+##### Admin View Products - View, Update, and Delete Products (Admin login -> navigates to dashboard -> click Products)
+- Admin views an empty list of Products
+- Admin views product list and verifies product details. 
+- Admin edits an existing Product -> verify product updated successfully
+- Admin deletes an existing Product -> verify product deleted successfully
+
+#### Marcus
+
+#### Yi Jing
+
+#### Tzu Che  
