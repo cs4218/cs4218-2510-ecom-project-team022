@@ -24,6 +24,16 @@ app.delete(
   productControllers.deleteProductController
 );
 
+//recommended by AI to prevent errors during testing 
+jest.mock('braintree', () => ({
+  BraintreeGateway: jest.fn().mockImplementation(() => ({
+    transaction: {
+      sale: jest.fn().mockResolvedValue({ success: true }),
+    },
+  })),
+  Environment: { Sandbox: 'sandbox' },
+}));
+
 let mongoServer;
 
 beforeAll(async () => {
