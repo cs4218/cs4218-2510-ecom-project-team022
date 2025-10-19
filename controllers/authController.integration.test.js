@@ -41,6 +41,16 @@ const createTestApp = () => {
   return app;
 };
 
+//recommended by AI to prevent errors during testing
+jest.mock("braintree", () => ({
+  BraintreeGateway: jest.fn().mockImplementation(() => ({
+    transaction: {
+      sale: jest.fn().mockResolvedValue({ success: true }),
+    },
+  })),
+  Environment: { Sandbox: "sandbox" },
+}));
+
 const testUser = {
   name: "Test User",
   email: "testuser@example.com",
