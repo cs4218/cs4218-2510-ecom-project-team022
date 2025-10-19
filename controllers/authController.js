@@ -6,7 +6,73 @@ import JWT from "jsonwebtoken";
 
 const PASSWORD_TOO_SHORT = "Password must be at least 6 characters long";
 
+// for admin access for testing purposes
+export const registerAdminController = async (req, res) => {
+  console.log("reigsterController", req.body);
+  try {
+    const { name, email, password, phone, address, answer } = req.body;
+    //validations
+    if (!name) {
+      return res.status(400).send({ error: "Name is Required" });
+    }
+    if (!email) {
+      return res.status(400).send({ message: "Email is Required" });
+    }
+    if (!password) {
+      return res.status(400).send({ message: "Password is Required" });
+    }
+    if (!phone) {
+      return res.status(400).send({ message: "Phone no is Required" });
+    }
+    if (!address) {
+      return res.status(400).send({ message: "Address is Required" });
+    }
+    if (!answer) {
+      return res.status(400).send({ message: "Answer is Required" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).send({ message: PASSWORD_TOO_SHORT });
+    }
+    //check user
+    const exisitingUser = await userModel.findOne({ email });
+    //exisiting user
+    if (exisitingUser) {
+      return res.status(200).send({
+        success: false,
+        message: "Already Register please login",
+      });
+    }
+    //register user
+    const hashedPassword = await hashPassword(password);
+    //save
+    const user = await new userModel({
+      name,
+      email,
+      phone,
+      address,
+      password: hashedPassword,
+      answer,
+      role: 1, // set role to admin
+    }).save();
+
+    res.status(201).send({
+      success: true,
+      message: "Admin Register Successfully",
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Errro in Registeration",
+      error,
+    });
+  }
+};
+
 export const registerController = async (req, res) => {
+  console.log("reigsterController", req.body);
   try {
     const { name, email, password, phone, address, answer } = req.body;
     //validations
@@ -89,7 +155,7 @@ export const loginController = async (req, res) => {
     }
     const match = await comparePassword(password, user.password);
     if (!match) {
-      return res.status(200).send({
+      return res.status(401).send({
         success: false,
         message: "Invalid Password",
       });
@@ -147,7 +213,7 @@ export const forgotPasswordController = async (req, res) => {
     const user = await userModel.findOne({ email, answer });
     //validation
     if (!user) {
-      return res.status(404).send({
+      return res.status(401).send({
         success: false,
         message: "Wrong Email Or Answer",
       });
