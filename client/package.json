@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.15.0",
     "axios": "^1.12.1",
+    "axios-mock-adapter": "^2.1.0",
     "braintree-web-drop-in-react": "^1.2.1",
     "markbind-cli": "^2.15.2",
     "moment": "^2.30.1",

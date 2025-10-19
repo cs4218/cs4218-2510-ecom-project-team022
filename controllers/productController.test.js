@@ -247,7 +247,7 @@ describe("createProductController", () => {
       expect.objectContaining({
         success: true,
         message: productControllers.successMessages.CREATE_PRODUCT,
-        products: expect.objectContaining({
+        product: expect.objectContaining({
           name: "A",
           description: "descriptionA",
           price: 20,
@@ -513,7 +513,7 @@ describe("updateProductController", () => {
       contentType: "image/jpg",
     });
     expect(mockProduct.save).toHaveBeenCalled();
-    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: true,
