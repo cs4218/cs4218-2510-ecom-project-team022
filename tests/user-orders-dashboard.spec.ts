@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { loginUser } from "./helpers";
 
-test.describe("Existing user orders", () => {
-  test("existing user vith orders can view their past orders", async ({ page }) => {
+test.describe.parallel("Existing user orders", () => {
+
+  test.beforeEach(async ({ page }) => {
     // Login as known test user
     await loginUser(page, "user@gmail.com", "password");
 
@@ -14,10 +15,9 @@ test.describe("Existing user orders", () => {
     // Wait for orders to load
     const orders = page.locator(".row.mb-2.p-3.card.flex-row"); 
     await expect(orders.first()).toBeVisible({ timeout: 10000 });
+  });
 
-    // Check number of orders and key info
-    const count = await orders.count();
-    expect(count).toBe(3);
+  test("orders table headers are correct", async ({ page }) => {
     const table = page.locator("table");
     await expect(table).toBeVisible({ timeout: 10000 });
 
@@ -30,11 +30,19 @@ test.describe("Existing user orders", () => {
       const text = await headers.nth(i).textContent();
       expect(text?.trim()).toBe(expectedHeaders[i]);
     }
+  });
 
-    // Check that at least one order row exists
-    const rows = table.locator("tbody tr");
-    if ((await rows.count()) > 0) {
-      await expect(rows.first()).toBeVisible();
-    }
+  test("orders count is correct", async ({ page }) => {
+    const orders = page.locator(".row.mb-2.p-3.card.flex-row");
+    const count = await orders.count();
+    expect(count).toBe(3);
+  });
+
+  test("at least one order row exists", async ({ page }) => {
+    const rows = page.locator("table tbody tr");
+    const rowCount = await rows.count();
+    expect(rowCount).toBeGreaterThan(0);
+
+    await expect(rows.first()).toBeVisible();
   });
 });
