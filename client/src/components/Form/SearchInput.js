@@ -2,6 +2,10 @@ import React from "react";
 import { useSearch } from "../../context/search";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+export const ERROR_MESSAGE = "Something went wrong. Please try again later.";
+
 const SearchInput = () => {
   const [values, setValues] = useSearch();
   const navigate = useNavigate();
@@ -16,6 +20,7 @@ const SearchInput = () => {
       navigate("/search");
     } catch (error) {
       console.log(error);
+      toast.error(ERROR_MESSAGE);
     }
   };
   return (
