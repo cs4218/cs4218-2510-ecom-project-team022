@@ -253,6 +253,23 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 #### Krista
 
+##### User Actions - Products per Category
+
+- Categories -> Choose Category -> Product Per Category -> View Product Details 
+- Categories -> All Categories -> Categories Page -> Choose Category -> Product Per Category -> View Product Details 
+
+##### User Actions - Home Page Product Processing
+
+- Home -> Search Product(s) -> View Product Details
+- Home -> Filter Product(s) by Price -> View Product Details
+- Home -> Load More Products -> View Product Details
+
+##### User Actions - Product Detail Page Functionalites
+
+- View Product Details -> Add Product to Cart
+- View Product Details -> Add Related Product to Cart
+- View Product Details -> View Related Product Details
+
 #### Zann
 
 ##### Admin View Users
