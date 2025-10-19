@@ -136,7 +136,7 @@ describe("AuthController integration Tests", () => {
         password: "password123",
       });
 
-      expect(loginRes.statusCode).toBe(404);
+      expect(loginRes.statusCode).toBe(401);
       expect(loginRes.body).toHaveProperty("success", false);
       expect(loginRes.body).toHaveProperty(
         "message",

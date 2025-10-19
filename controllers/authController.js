@@ -140,7 +140,7 @@ export const loginController = async (req, res) => {
     const { email, password } = req.body;
     //validation
     if (!email || !password) {
-      return res.status(404).send({
+      return res.status(401).send({
         success: false,
         message: "Invalid email or password",
       });
@@ -148,7 +148,7 @@ export const loginController = async (req, res) => {
     //check user
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(404).send({
+      return res.status(401).send({
         success: false,
         message: "Email is not registered",
       });
