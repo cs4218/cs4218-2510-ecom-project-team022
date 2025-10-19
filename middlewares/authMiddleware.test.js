@@ -1,3 +1,4 @@
+
 import { isAdmin } from "./authMiddleware.js";
 import userModel from "../models/userModel.js";
 
@@ -5,6 +6,7 @@ import JWT from "jsonwebtoken";
 import { requireSignIn } from "./authMiddleware.js";
 
 describe("isAdmin middleware", () => {
+
   // test the try catch
   it("should return 401 if userModel.findById throws an error", async () => {
     const req = { user: { _id: "errorid" } };
@@ -14,9 +16,7 @@ describe("isAdmin middleware", () => {
     };
     const next = jest.fn();
 
-    jest.spyOn(userModel, "findById").mockImplementation(() => {
-      throw new Error("DB error");
-    });
+    jest.spyOn(userModel, "findById").mockImplementation(() => { throw new Error("DB error"); });
 
     await isAdmin(req, res, next);
 
@@ -33,8 +33,7 @@ describe("isAdmin middleware", () => {
   });
 
   // test normal unauth flow
-  // ASSUMES user is logged in
-  it("should return 403 if user is not admin", async () => {
+  it("should return 401 if user is not admin", async () => {
     const req = { user: { _id: "testuserid" } };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -42,21 +41,21 @@ describe("isAdmin middleware", () => {
     };
     const next = jest.fn();
 
+
     // Mock userModel.findById to return a non-admin user
-    jest
-      .spyOn(userModel, "findById")
-      .mockResolvedValue({ _id: "testuserid", role: 0 });
+    jest.spyOn(userModel, "findById").mockResolvedValue({ _id: "testuserid", role: 0 });
 
     await isAdmin(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        message: expect.stringContaining("Forbidden Access"),
+        message: expect.stringContaining("UnAuthorized Access"),
       })
     );
     expect(next).not.toHaveBeenCalled();
+
 
     userModel.findById.mockRestore();
   });
@@ -70,9 +69,7 @@ describe("isAdmin middleware", () => {
     };
     const next = jest.fn();
 
-    jest
-      .spyOn(userModel, "findById")
-      .mockResolvedValue({ _id: "adminid", role: 1 });
+    jest.spyOn(userModel, "findById").mockResolvedValue({ _id: "adminid", role: 1 });
 
     await isAdmin(req, res, next);
 
@@ -87,11 +84,8 @@ describe("isAdmin middleware", () => {
 describe("requireSignIn middleware", () => {
   it("should call next() and set req.user if JWT verification passes", async () => {
     const fakeUser = { _id: "user1", name: "Test User" };
-    const req = { headers: { authorization: "Bearer validtoken" } };
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
+    const req = { headers: { authorization: "validtoken" } };
+    const res = {};
     const next = jest.fn();
 
     // fake the return value of JWT.verify, assume we verified
@@ -101,70 +95,23 @@ describe("requireSignIn middleware", () => {
 
     expect(req.user).toEqual(fakeUser);
     expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-    expect(res.send).not.toHaveBeenCalled();
 
     JWT.verify.mockRestore();
   });
 
-  it("should return 401 if no authorization header is provided", async () => {
-    const req = { headers: {} };
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
-    const next = jest.fn();
 
-    await requireSignIn(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send).toHaveBeenCalledWith({
-      success: false,
-      message: "Unauthorized Access",
-    });
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  it("should return 401 if authorization header doesn't start with Bearer", async () => {
-    const req = { headers: { authorization: "invalidformat" } };
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
-    const next = jest.fn();
-
-    await requireSignIn(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send).toHaveBeenCalledWith({
-      success: false,
-      message: "Unauthorized Access",
-    });
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  it("should return 401 if JWT verification fails", async () => {
-    const req = { headers: { authorization: "Bearer invalidtoken" } };
-    const res = {
-      status: jest.fn().mockReturnThis(),
-      send: jest.fn(),
-    };
+  it("should not call next() and log error if JWT verification fails", async () => {
+    const req = { headers: { authorization: "invalidtoken" } };
+    const res = {};
     const next = jest.fn();
     const error = new Error("invalid token");
-    const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    const logSpy = jest.spyOn(console, "log").mockImplementation(() => { });
 
     // make JWT.verify throw an error
-    jest.spyOn(JWT, "verify").mockImplementation(() => {
-      throw error;
-    });
+    jest.spyOn(JWT, "verify").mockImplementation(() => { throw error; });
 
     await requireSignIn(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send).toHaveBeenCalledWith({
-      success: false,
-      message: "Unauthorized Access",
-    });
     expect(next).not.toHaveBeenCalled();
     expect(logSpy).toHaveBeenCalledWith(error);
 

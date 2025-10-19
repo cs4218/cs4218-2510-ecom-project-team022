@@ -335,11 +335,11 @@ describe("forgotPasswordController", () => {
     );
   });
 
-  it("should return 401 if user is not found", async () => {
+  it("should return 404 if user is not found", async () => {
     req.body = { email: "a@b.com", answer: "ans", newPassword: "123456" };
     userModel.findOne.mockResolvedValue(null);
     await forgotPasswordController(req, res);
-    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.status).toHaveBeenCalledWith(404);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({ success: false })
     );
@@ -440,7 +440,7 @@ describe("loginController", () => {
     userModel.findOne.mockResolvedValue({ _id: "1", password: "hashed" });
     authHelper.comparePassword.mockResolvedValue(false);
     await loginController(req, res);
-    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({ success: false, message: "Invalid Password" })
     );

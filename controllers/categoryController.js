@@ -2,33 +2,33 @@ import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
 
 export const fieldMessages = {
-  NAME: "Name is Required",
-};
+  NAME: 'Name is Required',
+}
 
 export const successMessages = {
   // Zann - Admin Actions
-  CREATE_CATEGORY: "New Category Created Successfully",
-  DELETE_CATEGORY: "Category Deleted Successfully",
-  UPDATE_CATEGORY: "Category Updated Successfully",
-  DUPLICATE_CATEGORY: "Category Already Exist",
+  CREATE_CATEGORY: 'New Category Created Successfully',
+  DELETE_CATEGORY: 'Category Deleted Successfully',
+  UPDATE_CATEGORY: 'Category Updated Successfully',
+  DUPLICATE_CATEGORY: 'Category Already Exist',
 
   // Yi Jing - Category
-  GET_ALL_CATEGORIES: "Get All Categories List Successfully",
-  GET_SINGLE_CATEGORY: "Get Single Category Successfully",
-};
+  GET_ALL_CATEGORIES: 'Get All Categories List Successfully',
+  GET_SINGLE_CATEGORY: 'Get Single Category Successfully',
+}
 
 export const errorMessages = {
   // Zann - Admin Actions
-  CREATE_CATEGORY: "Error While Creating New Category",
-  DELETE_CATEGORY: "Error While Deleting Category",
-  UPDATE_CATEGORY: "Error While Updating Category",
+  CREATE_CATEGORY: 'Error While Creating New Category',
+  DELETE_CATEGORY: 'Error While Deleting Category',
+  UPDATE_CATEGORY: 'Error While Updating Category',
 
   // Yi Jing - Category
-  GET_ALL_CATEGORIES: "Error While Getting All Categories List",
-  GET_SINGLE_CATEGORY: "Error While Getting Single Category",
-};
+  GET_ALL_CATEGORIES: 'Error While Getting All Categories List',
+  GET_SINGLE_CATEGORY: 'Error While Getting Single Category',
+}
 
-// Zann - Admin Actions
+  // Zann - Admin Actions
 export const createCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
@@ -61,7 +61,7 @@ export const createCategoryController = async (req, res) => {
   }
 };
 
-// Zann - Admin Actions
+  // Zann - Admin Actions
 export const updateCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
@@ -122,9 +122,8 @@ export const singleCategoryController = async (req, res) => {
   }
 };
 
-// Zann - Admin Actions
-export const deleteCategoryController = async (req, res) => {
-  //changed from deleteCategoryCOntroller
+  // Zann - Admin Actions
+export const deleteCategoryController = async (req, res) => { //changed from deleteCategoryCOntroller
   try {
     const { id } = req.params;
     await categoryModel.findByIdAndDelete(id);

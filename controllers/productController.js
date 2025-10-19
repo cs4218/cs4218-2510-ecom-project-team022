@@ -82,17 +82,16 @@ export const createProductController = async (req, res) => {
         return res.status(500).send({ error: fieldMessages.PHOTO });
     }
 
-    const product = new productModel({ ...req.fields, slug: slugify(name) });
-    if (photo) {
-      //note
-      product.photo.data = fs.readFileSync(photo.path);
-      product.photo.contentType = photo.type;
+    const products = new productModel({ ...req.fields, slug: slugify(name) });
+    if (photo) { //note
+      products.photo.data = fs.readFileSync(photo.path);
+      products.photo.contentType = photo.type;
     }
-    await product.save();
+    await products.save();
     res.status(201).send({
       success: true,
       message: successMessages.CREATE_PRODUCT,
-      product: product, // NOTE: changed from 'products' to 'product'
+      products,
     });
   } catch (error) {
     console.log(error);
@@ -214,13 +213,12 @@ export const updateProductController = async (req, res) => {
       { ...req.fields, slug: slugify(name) },
       { new: true }
     );
-    if (photo) {
-      //note
+    if (photo) { //note
       products.photo.data = fs.readFileSync(photo.path);
       products.photo.contentType = photo.type;
     }
     await products.save();
-    res.status(200).send({
+    res.status(201).send({
       success: true,
       message: successMessages.UPDATE_PRODUCT,
       products,

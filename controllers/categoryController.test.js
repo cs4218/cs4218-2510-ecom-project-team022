@@ -1,9 +1,9 @@
-import * as categoryControllers from "./categoryController.js";
+import * as categoryControllers from './categoryController.js';
 import categoryModel from "../models/categoryModel.js";
 import slugify from "slugify";
 console.log(categoryControllers);
 
-jest.mock("../models/categoryModel", () => {
+jest.mock('../models/categoryModel', () => {
   const mockQueryChain = {
     populate: jest.fn().mockReturnThis(),
     select: jest.fn().mockReturnThis(),
@@ -15,10 +15,8 @@ jest.mock("../models/categoryModel", () => {
 
   const MockCategoryModel = jest.fn().mockImplementation((fields) => ({
     ...fields,
-    slug: fields.name && "slugA",
-    save: jest
-      .fn()
-      .mockResolvedValue({ _id: "123456", name: "A", slug: "slugA" }),
+    slug: fields.name && 'slugA',
+    save: jest.fn().mockResolvedValue({_id: '123456', name: 'A', slug: 'slugA'}),
   }));
 
   // Mock methods that return a query chain
@@ -37,11 +35,11 @@ jest.mock("../models/categoryModel", () => {
   return MockCategoryModel;
 });
 
-jest.mock("../models/orderModel", () => ({
+jest.mock('../models/orderModel', () => ({
   save: jest.fn().mockResolvedValue({ ok: true }),
 }));
 
-jest.mock("slugify");
+jest.mock('slugify');
 
 const mockResponse = () => {
   const res = {};
@@ -52,13 +50,13 @@ const mockResponse = () => {
   return res;
 };
 
-// Zann - createCategoryController
-describe("createCategoryController", () => {
+// Zann - createCategoryController 
+describe('createCategoryController', () => {
   let req;
   let res;
   beforeEach(() => {
     res = mockResponse();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
     jest.clearAllMocks();
   });
 
@@ -66,124 +64,122 @@ describe("createCategoryController", () => {
     logSpy.mockRestore();
   });
 
-  test("return error when name missing", async () => {
-    const req = { body: {} };
+    test('return error when name missing', async () => {
+        const req = {body: {}};
 
-    await categoryControllers.createCategoryController(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.send.mock.calls[0][0].message).toBe(
-      categoryControllers.fieldMessages.NAME
-    );
-  });
-
-  test("successfully create category", async () => {
+        await categoryControllers.createCategoryController(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.send.mock.calls[0][0].message).toBe(categoryControllers.fieldMessages.NAME);
+    });
+  
+    test('successfully create category', async () => {
+        const req = {
+            body: {name: 'A'}, 
+            params: {id: '123456'}
+        };
+        const mockCategory = { _id: '123456', name: 'A', slug: 'slugA' }
+        categoryModel.findOne.mockResolvedValue(null);
+        slugify.mockReturnValue('slugA');
+        
+        await categoryControllers.createCategoryController(req, res);
+        
+        expect(slugify).toHaveBeenCalledWith(req.body.name);
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+            success: true,
+            message: categoryControllers.successMessages.CREATE_CATEGORY,
+            category: mockCategory
+            })
+        );
+    });
+    
+  test('successfully create category - duplicate category', async () => {
     const req = {
-      body: { name: "A" },
-      params: { id: "123456" },
+      body: {name: 'A'}, 
+      params: {id: '123456'}
     };
-    const mockCategory = { _id: "123456", name: "A", slug: "slugA" };
-    categoryModel.findOne.mockResolvedValue(null);
-    slugify.mockReturnValue("slugA");
-
-    await categoryControllers.createCategoryController(req, res);
-
-    expect(slugify).toHaveBeenCalledWith(req.body.name);
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.send).toHaveBeenCalledWith(
-      expect.objectContaining({
-        success: true,
-        message: categoryControllers.successMessages.CREATE_CATEGORY,
-        category: mockCategory,
-      })
-    );
-  });
-
-  test("successfully create category - duplicate category", async () => {
-    const req = {
-      body: { name: "A" },
-      params: { id: "123456" },
-    };
-    const exisitingCategory = { _id: "123456", name: "A", slug: "slugA" };
+    const exisitingCategory = { _id: '123456', name: 'A', slug: 'slugA' }
     categoryModel.findOne.mockResolvedValue(exisitingCategory);
-
+    
     await categoryControllers.createCategoryController(req, res);
-
+    
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.send).toHaveBeenCalledWith(
+     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: true,
         message: categoryControllers.successMessages.DUPLICATE_CATEGORY,
-      })
-    );
-  });
+        })
+      );
+    });
 
   test("handle error properly", async () => {
-    const errorMessage = "There's an error";
-    const mockError = new Error(errorMessage);
-    categoryModel.findOne.mockRejectedValue(mockError);
-    const req = {
-      body: { name: "A" },
-      params: { id: "123456" },
-    };
-
-    await categoryControllers.createCategoryController(req, res);
-
-    expect(logSpy).toHaveBeenCalled();
-    expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith({
-      success: false,
-      error: mockError,
-      message: categoryControllers.errorMessages.CREATE_CATEGORY,
+      const errorMessage = "There's an error";
+      const mockError = new Error(errorMessage);
+      categoryModel.findOne.mockRejectedValue(mockError);
+      const req = {
+        body: {name: 'A'}, 
+        params: {id: '123456'}
+     };
+  
+      await categoryControllers.createCategoryController(req, res); 
+      
+      expect(logSpy).toHaveBeenCalled();
+      expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.send).toHaveBeenCalledWith({
+          success: false,
+          error: mockError,
+          message: categoryControllers.errorMessages.CREATE_CATEGORY,
+        });
     });
-  });
 });
 
-// Zann - updateCategoryController
-describe("updateCategoryController", () => {
+// Zann - updateCategoryController 
+describe('updateCategoryController', () => {
   let req;
   let res;
   beforeEach(() => {
-    req = { params: { id: "123456" } };
+    req = {params: {id: '123456'}};
     res = mockResponse();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
     jest.clearAllMocks();
   });
 
   afterEach(() => {
     logSpy.mockRestore();
   });
-
-  test("successfully update category", async () => {
+  
+  test('successfully update category', async () => {
     const req = {
-      body: { name: "A" },
-      params: { id: "123456" },
+      body: {name: 'A'}, 
+      params: {id: '123456'}
     };
     const mockCategory = {
-      _id: req.params.id,
-      name: req.body.name,
-      slug: "slugA",
+        _id: req.params.id,
+        name: req.body.name, 
+        slug: 'slugA',
     };
     categoryModel.findByIdAndUpdate.mockResolvedValue(mockCategory);
-
+    
     await categoryControllers.updateCategoryController(req, res);
-
+    
     expect(slugify).toHaveBeenCalledWith(req.body.name);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: true,
         message: categoryControllers.successMessages.UPDATE_CATEGORY,
-        category: mockCategory,
-      })
-    );
-  });
+        category: mockCategory
+        })
+      );
+    });
 
-  test("handle error properly", async () => {
+  test('handle error properly', async () => {
     const req = {
-      body: { name: "A" },
-      params: { id: "123456" },
+      body: {name: 'A'}, 
+      params: {id: '123456'}
     };
 
     const errorMessage = "There's an error";
@@ -191,7 +187,7 @@ describe("updateCategoryController", () => {
     categoryModel.findByIdAndUpdate.mockRejectedValueOnce(mockError);
 
     await categoryControllers.updateCategoryController(req, res);
-
+    
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
     expect(res.status).toHaveBeenCalledWith(500);
@@ -200,13 +196,13 @@ describe("updateCategoryController", () => {
         success: false,
         error: mockError,
         message: categoryControllers.errorMessages.UPDATE_CATEGORY,
-      })
-    );
-  });
+        })
+      );
+    });
 });
 
 // Yi Jing - categoryController
-describe("categoryController", () => {
+describe('categoryController', () => {
   let req;
   let res;
   let logSpy;
@@ -214,7 +210,7 @@ describe("categoryController", () => {
   beforeEach(() => {
     req = {};
     res = mockResponse();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.clearAllMocks();
   });
 
@@ -222,10 +218,10 @@ describe("categoryController", () => {
     logSpy.mockRestore();
   });
 
-  test("successfully fetches all categories", async () => {
+  test('successfully fetches all categories', async () => {
     const mockCategories = [
-      { _id: "1", name: "Electronics", slug: "electronics" },
-      { _id: "2", name: "Books", slug: "books" },
+      { _id: '1', name: 'Electronics', slug: 'electronics' },
+      { _id: '2', name: 'Books', slug: 'books' },
     ];
 
     categoryModel.find.mockResolvedValue(mockCategories);
@@ -243,7 +239,7 @@ describe("categoryController", () => {
     );
   });
 
-  test("handles error properly", async () => {
+  test('handles error properly', async () => {
     const errorMessage = "Database fetch error";
     const mockError = new Error(errorMessage);
     categoryModel.find.mockRejectedValueOnce(mockError);
@@ -265,15 +261,16 @@ describe("categoryController", () => {
   });
 });
 
+
 // Yi Jing - singleCategoryController
-describe("singleCategoryController", () => {
+describe('singleCategoryController', () => {
   let req;
   let res;
   let logSpy;
 
   beforeEach(() => {
     res = mockResponse();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.clearAllMocks();
   });
 
@@ -281,15 +278,15 @@ describe("singleCategoryController", () => {
     logSpy.mockRestore();
   });
 
-  test("successfully fetches a single category by slug", async () => {
-    const mockCategory = { _id: "1", name: "Books", slug: "books" };
-    const req = { params: { slug: "books" } };
+  test('successfully fetches a single category by slug', async () => {
+    const mockCategory = { _id: '1', name: 'Books', slug: 'books' };
+    const req = { params: { slug: 'books' } };
 
     categoryModel.findOne.mockResolvedValue(mockCategory);
 
     await categoryControllers.singleCategoryController(req, res);
 
-    expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: "books" });
+    expect(categoryModel.findOne).toHaveBeenCalledWith({ slug: 'books' });
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -300,10 +297,10 @@ describe("singleCategoryController", () => {
     );
   });
 
-  test("handles error properly", async () => {
+  test('handles error properly', async () => {
     const errorMessage = "Something went wrong fetching category";
     const mockError = new Error(errorMessage);
-    const req = { params: { slug: "invalid" } };
+    const req = { params: { slug: 'invalid' } };
 
     categoryModel.findOne.mockRejectedValueOnce(mockError);
 
@@ -312,7 +309,7 @@ describe("singleCategoryController", () => {
     // Check that the error was logged internally
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0]).toBe(mockError);
-
+    
     // Check HTTP response
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith(
@@ -324,14 +321,15 @@ describe("singleCategoryController", () => {
   });
 });
 
+
 // Zann - deleteCategoryController
-describe("deleteCategoryController", () => {
+describe('deleteCategoryController', () => {
   let req;
   let res;
   beforeEach(() => {
-    req = { params: { id: "123456" } };
+    req = {params: {id: '123456'}};
     res = mockResponse();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
     jest.clearAllMocks();
   });
 
@@ -339,29 +337,29 @@ describe("deleteCategoryController", () => {
     logSpy.mockRestore();
   });
 
-  test("successfully delete category", async () => {
+  test('successfully delete category', async () => {
     categoryModel.findByIdAndDelete.mockReturnValue({
-      select: jest.fn().mockResolvedValue({ _id: "123456" }),
+      select: jest.fn().mockResolvedValue({_id: '123456'}),
     });
 
     await categoryControllers.deleteCategoryController(req, res);
-
+    
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: true,
         message: categoryControllers.successMessages.DELETE_CATEGORY,
-      })
-    );
-  });
+        })
+      );
+    });
 
-  test("handle error properly", async () => {
+  test('handle error properly', async () => {
     const errorMessage = "There's an error";
     const mockError = new Error(errorMessage);
     categoryModel.findByIdAndDelete.mockRejectedValueOnce(mockError);
 
     await categoryControllers.deleteCategoryController(req, res);
-
+    
     expect(logSpy).toHaveBeenCalled();
     expect(logSpy.mock.calls[0][0].message).toBe(errorMessage);
     expect(res.status).toHaveBeenCalledWith(500);
@@ -370,7 +368,7 @@ describe("deleteCategoryController", () => {
         success: false,
         message: categoryControllers.errorMessages.DELETE_CATEGORY,
         error: mockError,
-      })
-    );
-  });
+        })
+      );
+    });
 });
