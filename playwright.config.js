@@ -14,8 +14,10 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
   },
   webServer: { //to start server automatically
-  command: 'npm run dev',
-  port: 3000,
-  reuseExistingServer: !process.env.CI,
-},
+    command: 'npm run dev',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+  },
+  fullyParallel: true, // allow tests in files to run in parallel
+  workers: 4,   
 });
