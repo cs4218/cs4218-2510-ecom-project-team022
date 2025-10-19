@@ -3,10 +3,10 @@ import { loginUser } from "./helpers";
 
 const BASE_URL = "http://localhost:3000";
 
-test.describe("Search Feature", () => {
+test.describe.parallel("Search Feature", () => {
 
   // Clicking search with empty input does nothing
-  test("clicking search with empty input does nothing and no toast appears", async ({ page }) => {
+  test("clicking search with empty input does nothing", async ({ page }) => {
     await page.goto(BASE_URL);
 
     const searchBox = page.getByRole("searchbox", { name: "Search" });
@@ -34,7 +34,7 @@ test.describe("Search Feature", () => {
 
 
 
-  // 2️⃣ Searching with random text returns no results
+  // Searching with random text returns no results
   test("searching with random text returns no products found", async ({ page }) => {
     await page.goto(BASE_URL);
     const searchBox = page.getByRole("searchbox", { name: "Search" });
