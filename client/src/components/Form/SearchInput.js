@@ -20,7 +20,6 @@ const SearchInput = () => {
       navigate("/search");
     } catch (error) {
       console.log(error);
-      toast.error(ERROR_MESSAGE);
     }
   };
   return (

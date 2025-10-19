@@ -87,9 +87,7 @@ describe("SearchInput Integration Test", () => {
     await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith("/api/v1/product/search/");
         expect(console.log).toHaveBeenCalledWith(expect.any(Error));
-        expect(toast.error).toHaveBeenCalledWith(ERROR_MESSAGE);
         expect(mockNavigate).not.toHaveBeenCalled();
-
     });
   });
 });
