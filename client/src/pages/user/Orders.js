@@ -77,6 +77,9 @@ const Orders = () => {
                 </div>
               );
             })}
+            {orders.length === 0 && (
+              <h6 style={{ textAlign: "center" }}>No Orders Found</h6>
+            )}
           </div>
         </div>
       </div>

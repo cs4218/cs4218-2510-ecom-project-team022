@@ -390,7 +390,7 @@ describe("loginController", () => {
   it("should return success: false if password is missing", async () => {
     req.body = { email: "a@b.com" };
     await loginController(req, res);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
@@ -402,7 +402,7 @@ describe("loginController", () => {
   it("should return success: false if email is missing", async () => {
     req.body = { password: "123456" };
     await loginController(req, res);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
@@ -413,7 +413,7 @@ describe("loginController", () => {
 
   it("should return success: false if email and password is missing", async () => {
     await loginController(req, res);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
@@ -426,7 +426,7 @@ describe("loginController", () => {
     req.body = { email: "a@b.com", password: "123456" };
     userModel.findOne.mockResolvedValue(null);
     await loginController(req, res);
-    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,

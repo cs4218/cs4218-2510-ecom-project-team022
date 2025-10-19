@@ -39,6 +39,16 @@ import productModel from "../models/productModel.js";
 
 import * as authControllers from "../controllers/authController.js";
 
+//recommended by AI to prevent errors during testing
+jest.mock("braintree", () => ({
+  BraintreeGateway: jest.fn().mockImplementation(() => ({
+    transaction: {
+      sale: jest.fn().mockResolvedValue({ success: true }),
+    },
+  })),
+  Environment: { Sandbox: "sandbox" },
+}));
+
 // Configure environment
 dotenv.config();
 

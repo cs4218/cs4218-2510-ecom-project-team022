@@ -41,6 +41,16 @@ const createTestApp = () => {
   return app;
 };
 
+//recommended by AI to prevent errors during testing
+jest.mock("braintree", () => ({
+  BraintreeGateway: jest.fn().mockImplementation(() => ({
+    transaction: {
+      sale: jest.fn().mockResolvedValue({ success: true }),
+    },
+  })),
+  Environment: { Sandbox: "sandbox" },
+}));
+
 const testUser = {
   name: "Test User",
   email: "testuser@example.com",
@@ -136,7 +146,7 @@ describe("AuthController integration Tests", () => {
         password: "password123",
       });
 
-      expect(loginRes.statusCode).toBe(404);
+      expect(loginRes.statusCode).toBe(401);
       expect(loginRes.body).toHaveProperty("success", false);
       expect(loginRes.body).toHaveProperty(
         "message",
