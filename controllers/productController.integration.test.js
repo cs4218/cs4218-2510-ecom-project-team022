@@ -15,6 +15,16 @@ app.post('/api/v1/product/create-product', productControllers.createProductContr
 app.put('/api/v1/product/update-product/:pid', productControllers.updateProductController);
 app.delete('/api/v1/product/delete-product/:pid', productControllers.deleteProductController);
 
+//recommended by AI to prevent errors during testing 
+jest.mock('braintree', () => ({
+  BraintreeGateway: jest.fn().mockImplementation(() => ({
+    transaction: {
+      sale: jest.fn().mockResolvedValue({ success: true }),
+    },
+  })),
+  Environment: { Sandbox: 'sandbox' },
+}));
+
 let mongoServer;
 
 beforeAll(async () => {
