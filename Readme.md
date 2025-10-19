@@ -158,7 +158,7 @@ The following shows the scope of our individal unit testing and bug fixing.
 | Feature         | Client Related Files (/client/src/)                            | Server Related Files (./)                                                                                                                                                                                                                                                                                                                                        |
 | --------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Admin Dashboard | - components/AdminMenu.js <br> - pages/admin/AdminDashboard.js |                                                                                                                                                                                                                                                                                                                                                                  |
-| Product         | - pages/productDetails.js <br> - pages/categoryProduct.js      | - controllers/productController.js <br> 1. getProductController <br> 2. getSingleProductController <br> 3. productPhotoController <br> 4. productFiltersController <br> 5. productCountController <br> 6. productListController <br> 7. searchProductController <br> 8. relatedProductController <br> 9. productCategoryController <br> - models/ProductModel.js |
+| Product         | - pages/ProductDetails.js <br> - pages/CategoryProduct.js      | - controllers/productController.js <br> 1. getProductController <br> 2. getSingleProductController <br> 3. productPhotoController <br> 4. productFiltersController <br> 5. productCountController <br> 6. productListController <br> 7. searchProductController <br> 8. relatedProductController <br> 9. productCategoryController <br> - models/ProductModel.js |
 
 #### Zann
 
@@ -208,7 +208,7 @@ The following shows the scope of our individal unit testing and bug fixing.
 | Feature         | Client Related Files (/client/src/)                            | Server Related Files (./)                                                                                                                                                                                                                                                                                                                                        |
 | --------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Admin Dashboard | - components/AdminMenu.js <br> - pages/admin/AdminDashboard.js |                                                                                                                                                                                                                                                                                                                                                                  |
-| Product         | - pages/productDetails.js <br> - pages/categoryProduct.js      | - controllers/productController.js <br> 1. getProductController <br> 2. getSingleProductController <br> 3. productPhotoController <br> 4. productFiltersController <br> 5. productCountController <br> 6. productListController <br> 7. searchProductController <br> 8. relatedProductController <br> 9. productCategoryController <br> - models/ProductModel.js |
+| Product         | - pages/ProductDetails.js <br> - pages/CategoryProduct.js      | - controllers/productController.js <br> 1. getProductController <br> 2. getSingleProductController <br> 3. productPhotoController <br> 4. productFiltersController <br> 5. productCountController <br> 6. productListController <br> 7. searchProductController <br> 8. relatedProductController <br> 9. productCategoryController <br> - models/ProductModel.js |
 
 #### Zann
 
@@ -266,8 +266,8 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 ##### User Actions - Product Detail Page Functionalites
 
-- View Product Details -> Add Product to Cart
-- View Product Details -> Add Related Product to Cart
+- View Product Details -> Add Product to Cart -> Cart (product added to cart)
+- View Product Details -> Add Related Product to Cart -> Cart (related product added to cart)
 - View Product Details -> View Related Product Details
 
 #### Zann
