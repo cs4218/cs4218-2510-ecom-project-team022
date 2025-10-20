@@ -15,4 +15,6 @@ export default defineConfig({
     port: 3000,
     reuseExistingServer: !process.env.CI,
   },
+  fullyParallel: true, // allow tests in files to run in parallel
+  workers: 4,
 });

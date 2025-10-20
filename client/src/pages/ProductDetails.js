@@ -64,7 +64,7 @@ const ProductDetails = () => {
                     })}
           </h6>
           <h6>Category : {product?.category?.name}</h6>
-          <button class="btn btn-secondary ms-1"
+          <button className="btn btn-secondary ms-1" // Fixed Bug: class to className
                   onClick={() => {
                     setCart([...cart, product]);
                     localStorage.setItem(

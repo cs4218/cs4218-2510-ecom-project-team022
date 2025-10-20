@@ -80,7 +80,9 @@ const HomePage = () => {
   };
 
   const handleFilter = (value, id) => {
-    setChecked((prev) => (value ? [...prev, id] : prev.filter((c) => c !== id)));
+    setChecked((prev) =>
+      value ? [...prev, id] : prev.filter((c) => c !== id)
+    );
   };
 
   useEffect(() => {
@@ -132,6 +134,7 @@ const HomePage = () => {
             {categories?.map((c) => (
               <Checkbox
                 key={c._id}
+                checked={checked.includes(c._id)}
                 onChange={(e) => handleFilter(e.target.checked, c._id)}
               >
                 {c?.name ?? ""}
@@ -141,7 +144,10 @@ const HomePage = () => {
           {/* price filter */}
           <h4 className="text-center mt-4">Filter By Price</h4>
           <div className="d-flex flex-column">
-            <Radio.Group onChange={(e) => setRadio(e.target.value)}>
+            <Radio.Group
+              value={radio}
+              onChange={(e) => setRadio(e.target.value)}
+            >
               {Prices?.map((p) => (
                 <div key={p._id}>
                   <Radio value={p.array}>{p.name}</Radio>
@@ -182,9 +188,7 @@ const HomePage = () => {
                       <h5 className="card-title">{p?.name ?? ""}</h5>
                       <h5 className="card-title card-price">{priceText}</h5>
                     </div>
-                    <p className="card-text ">
-                      {desc.substring(0, 60)}...
-                    </p>
+                    <p className="card-text ">{desc.substring(0, 60)}...</p>
                     <div className="card-name-price">
                       <button
                         className="btn btn-info ms-1"
@@ -195,7 +199,10 @@ const HomePage = () => {
                       <button
                         className="btn btn-dark ms-1"
                         onClick={() => {
-                          const next = [...(Array.isArray(cart) ? cart : []), p];
+                          const next = [
+                            ...(Array.isArray(cart) ? cart : []),
+                            p,
+                          ];
                           setCart(next);
                           localStorage.setItem("cart", JSON.stringify(next));
                           toast.success("Item Added to cart");
