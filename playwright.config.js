@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: "./tests",
   testMatch: "**/*.spec.@(js|ts)",
   testIgnore: ["**/*.test.@(js|ts)", "client/**", "src/**"],
+  globalSetup: require.resolve('./tests/global-setup.js'),
   use: {
     headless: false,
     viewport: { width: 1280, height: 720 },

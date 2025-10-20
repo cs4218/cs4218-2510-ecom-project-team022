@@ -8,7 +8,7 @@ const MOCK_ORDERS = [
   { status: "Delivered", buyer: "Charlie", date: "2025-10-18", payment: "Credit Card", quantity: 3 },
 ];
 
-test.describe("Existing user orders (mocked)", () => {
+test.describe("Existing user orders", () => {
 
   test.beforeEach(async ({ page }) => {
     // Mock the orders API to return fixed data
