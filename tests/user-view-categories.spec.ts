@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 const BASE_URL = 'http://localhost:3000/';
 
 test.describe('Category Tests', () => {
 
   // Helper to open "All Categories" menu
-  async function openAllCategories(page) {
+  async function openAllCategories(page: Page) {
     await page.getByRole('button', { name: 'Categories' }).click();
     await page.getByRole('link', { name: 'All Categories' }).click();
   }
