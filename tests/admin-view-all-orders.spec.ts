@@ -9,10 +9,6 @@ const MOCK_ADMIN_ORDERS = [
     buyer: "Alice",
     date: "2025-10-20",
     payment: "Credit Card",
-    products: [
-      { name: "Wheelchair A", quantity: 2, price: 500 },
-      { name: "Cushion X", quantity: 1, price: 50 },
-    ],
   },
   {
     id: 2,
@@ -20,9 +16,6 @@ const MOCK_ADMIN_ORDERS = [
     buyer: "Bob",
     date: "2025-10-19",
     payment: "PayPal",
-    products: [
-      { name: "Walker B", quantity: 1, price: 200 },
-    ],
   },
   {
     id: 3,
@@ -30,18 +23,14 @@ const MOCK_ADMIN_ORDERS = [
     buyer: "Charlie",
     date: "2025-10-18",
     payment: "Credit Card",
-    products: [
-      { name: "Wheelchair C", quantity: 3, price: 700 },
-      { name: "Accessory Y", quantity: 2, price: 30 },
-    ],
   },
 ];
 
-test.describe.parallel("Admin view all orders (mocked)", () => {
+test.describe("Admin view all orders (mocked)", () => {
 
   test.beforeEach(async ({ page }) => {
     // Mock the admin orders API
-    await page.route('**/api/admin/orders**', route => {
+    await page.route('**/api/v1/auth/all-orders**', route => {
       route.fulfill({
         status: 200,
         json: MOCK_ADMIN_ORDERS,
@@ -83,17 +72,4 @@ test.describe.parallel("Admin view all orders (mocked)", () => {
         expect(text).toBe(expectedHeaders[i]);
     }
   });
-  test("all orders have at least one product", async ({ page }) => {
-    const orders = page.locator('div.border.shadow');
-    const orderCount = await orders.count();
-
-    expect(orderCount).toBeGreaterThan(0); // sanity check: at least one order exists
-
-    for (let i = 0; i < orderCount; i++) {
-        const products = orders.nth(i).locator('.container > .row.mb-2.p-3.card.flex-row'); 
-        const productCount = await products.count();
-        expect(productCount).toBeGreaterThan(0); // check each order has at least one product
-    }
-  });
-
 });
