@@ -221,14 +221,10 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 #### Marcus
 
-| Feature          | Client Related Files (/client/src/)                                                         | Server Related Files (./)                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Protected Routes | - context/auth.js                                                                           | - helpers/authHelper.js <br> - middlewares/authMiddleware.js                                                             |
-| Registration     | - pages/Auth/Register.js                                                                    | - controllers/authController.js <br> 1. registerController <br> 2. loginController <br> 3. forgotPasswordController <br> |
-| Login            | - pages/Auth/Login.js                                                                       | (same as above)                                                                                                          |
-| General          | - components/Routes/Private.js <br> - components/UserMenu.js <br> - pages/user/Dashboard.js | - models/userModel.js                                                                                                    |
-| Profile          | - pages/user/Profile.js                                                                     |                                                                                                                          |
-| Admin Actions    | - pages/admin/CreateProduct.js <br> - pages/admin/UpdateProduct.js                          |                                                                                                                          |
+| Feature        | Client Related Files (/client/src/)           | Server Related Files (./)                                                                                                                                                                                           |
+| -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication | - context/auth.js (Login.integration.test.js) | - controllers/authController.js <br> 1. loginController <br> 2. registerController <br> 3. forgotPasswordController <br> 4. updateProfileController<br>- helpers/authHelper.js (authController.integration.test.js) |
+| Permission     | -                                             | - middlewares/authMiddleware.js (adminRouteProtection.integration.test.js)                                                                                                                                          |
 
 #### Yi Jing
 
@@ -255,8 +251,8 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 ##### User Actions - Products per Category
 
-- Categories -> Choose Category -> Product Per Category -> View Product Details 
-- Categories -> All Categories -> Categories Page -> Choose Category -> Product Per Category -> View Product Details 
+- Categories -> Choose Category -> Product Per Category -> View Product Details
+- Categories -> All Categories -> Categories Page -> Choose Category -> Product Per Category -> View Product Details
 
 ##### User Actions - Home Page Product Processing
 
@@ -297,6 +293,30 @@ The following shows the scope of our individal unit testing and bug fixing.
 - Admin deletes an existing Product -> verify product deleted successfully
 
 #### Marcus
+
+Route permission protection
+
+- Not-registered or logged in user tries to access user dashboard --> verify denied
+- Newly-registered user tries to access admin dashboard --> verify denied
+- Logged in non-admin user tries to access admin dashboard --> verify denied
+- Initially logged-in user logging out trying to access user dashboard --> verify denied
+- Initially logged-in user logging out trying to access admin dashboard --> verify denied
+- Admin user logging in and trying to access admin dashboard --> verify success
+
+Authentication
+
+- Register but with already registered email --> verify "email already registered" toast
+- Register with correct details --> verify "registered" toast
+- Login with correct details --> verify "logged in" toast
+- Login with incorrect details --> verify "incorrect login details" toast
+- Logged in user logs out --> verify redirect
+
+User
+
+- Newly registered user checks order dashboard --> verify no orders
+- Logged in user should have the correct name on the top header bar
+- Logged in user should have the correct name in the dashboard
+- Logged in user update profile --> verify profile updated in 1. top bar 2. profile page 3. cart page
 
 #### Yi Jing
 
