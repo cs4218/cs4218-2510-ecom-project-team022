@@ -3,7 +3,7 @@ import { loginUser } from "./helpers";
 
 const BASE_URL = "http://localhost:3000";
 
-test.describe.parallel("Search Feature", () => {
+test.describe("Search Feature", () => {
 
   // Clicking search with empty input does nothing
   test("clicking search with empty input does nothing", async ({ page }) => {
