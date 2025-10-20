@@ -8,10 +8,12 @@
     "server": "nodemon server.js",
     "client": "npm start --prefix ./client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "sonarqube": "sonarqube-scanner",
+    "sonarqube": "sonar-scanner",
+    "combine-coverage": "node combine-coverage.js",
+    "sonar": "npm run combine-coverage && sonar-scanner",
     "test": "npm run test:backend && npm run test:frontend",
-    "test:frontend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.config.js",
-    "test:backend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js"
+    "test:frontend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.frontend.config.js --coverage",
+    "test:backend": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.backend.config.js --coverage"
   },
   "keywords": [],
   "author": "RP",
@@ -56,7 +58,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "mongodb-memory-server": "^10.2.3",
-    "sonarqube-scanner": "^3.3.0",
+    "sonarqube-scanner": "^4.3.2",
     "supertest": "^7.1.4"
   }
 }

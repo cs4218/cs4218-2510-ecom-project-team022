@@ -38,4 +38,7 @@ export default {
     },
   },
   setupFilesAfterEnv: ["<rootDir>/client/src/setupTests.js"],
+
+  coverageDirectory: "<rootDir>/coverage/frontend",
+  coverageReporters: ["lcov", "text"],
 };

@@ -16,4 +16,7 @@ export default {
       functions: 90,
     },
   },
+
+  coverageDirectory: "coverage/backend",
+  coverageReporters: ["lcov", "text"],
 };
