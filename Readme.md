@@ -321,3 +321,32 @@ User
 #### Yi Jing
 
 #### Tzu Che
+##### Header
+
+- Header -> Verify brand logo, navigation links, and cart badge are visible and correctly displayed.
+- Header -> Test login and logout behaviour for guests, registered users, and administrators.
+- Header -> Confirm users are redirected to the correct dashboard based on their role after logging in.
+- Header -> Ensure categories dropdown loads properly and navigates to the selected category page.
+- Header -> Click header logo when not on homepage -> verify it redirects correctly to homepage.
+
+##### Footer
+
+- Footer -> Verify footer renders correctly on all pages and displays proper copyright text.
+- Footer -> Click “About”, “Contact”, and “Privacy Policy” links -> verify each navigates to the correct page.
+
+##### Static Pages (About, Contact, Privacy Policy, Page Not Found)
+
+- About/Contact/Policy/404 -> Verify content, titles, and layout display correctly.
+- About/Contact/Policy/404 -> Check that all images and hyperlinks render properly and lead to intended destinations.
+- 404 Page -> Click “Go Back” button -> verify it redirects correctly to HomePage.
+
+##### HomePage Filters
+
+- Homepage -> Apply category filters (checkbox selection) -> Apply price filters (radio selection) -> Click "RESET FILTERS" button -> Verify both visual state and content state reset correctly (identified critical bug where visual filters remained selected despite content resetting).
+- Homepage -> Apply multiple filters -> Reset filters -> Repeat cycle multiple times -> Verify consistent state management across multiple reset cycles.
+- Homepage -> Apply filters -> Click "RESET FILTERS" -> Check URL -> Verify URL state remains consistent with visual and content state.
+- Homepage -> Apply individual filters -> Use "RESET FILTERS" for bulk reset -> Verify all checkboxes and radio buttons clear completely.
+- Homepage -> Apply filters during loading states -> Click "RESET FILTERS" -> Verify reset functionality works correctly even during async operations.
+
+
+
