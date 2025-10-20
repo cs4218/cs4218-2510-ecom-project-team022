@@ -16,8 +16,9 @@ import productRoutes from "../routes/productRoutes.js";
 import userModel from "../models/userModel.js";
 import categoryModel from "../models/categoryModel.js";
 import productModel from "../models/productModel.js";
+import orderModel from "../models/orderModel.js";
 import { comparePassword, hashPassword } from "../helpers/authHelper.js";
-import { describe } from "node:test";
+
 
 // Configure environment
 dotenv.config();
@@ -60,6 +61,58 @@ const testUser = {
   answer: "test answer",
 };
 
+const testAdmin = {
+  name: "Admin User",
+  email: "admin@example.com",
+  password: "admin123",
+    phone: "1234567890",
+  address: "123 Test St",
+  answer: "test answer",
+  role: 1,
+};
+
+// ---------- Helper Functions ----------
+const registerAndLoginUser = async (app, user = testUser) => {
+  await request(app).post("/api/v1/auth/register").send(user);
+  const loginRes = await request(app)
+    .post("/api/v1/auth/login")
+    .send({ email: user.email, password: user.password });
+  return loginRes.body.token;
+};
+
+export const createAndLoginAdmin = async (app, adminData = testAdmin) => {
+  // 1. Remove any existing admin with the same email (important for in-memory DB)
+  await userModel.deleteOne({ email: adminData.email });
+
+  // 2. Hash password and create admin in DB
+  const hashedPassword = await hashPassword(adminData.password);
+  const admin = await userModel.create({ ...adminData, password: hashedPassword });
+
+  // 3. Log in using the admin credentials to get a valid token
+  const loginRes = await request(app)
+    .post("/api/v1/auth/login")
+    .send({ email: admin.email, password: adminData.password });
+
+  if (!loginRes.body.token) {
+    throw new Error("Admin login failed; no token returned");
+  }
+
+  // 4. Return both token and admin object (useful for tests)
+  return { token: loginRes.body.token, admin };
+};
+
+
+const createTestProduct = async () => {
+  const category = await categoryModel.create({ name: "Test Category", slug: "test-category" });
+  return await productModel.create({
+    name: "Test Product",
+    description: "A product for testing",
+    price: 50,
+    quantity: 10,
+    category: category._id,
+    slug: "test-product",
+  });
+};
 describe("AuthController integration Tests", () => {
   let mongoServer;
   let app;
@@ -369,4 +422,112 @@ describe("AuthController integration Tests", () => {
       expect(adminRes.body).toHaveProperty("message", "Forbidden Access");
     });
   });
+  // ---------- Order Tests ----------
+  describe("OrderController", () => {
+    let admin;
+    let adminToken;
+    let userToken;
+    let userId;
+
+    beforeEach(async () => {
+      const result = await createAndLoginAdmin(app);
+      adminToken = result.token;
+      admin = result.admin;
+
+      console.log("Admin ID:", admin._id.toString());
+      console.log("Admin token:", adminToken);
+
+      // Create normal user
+      userToken = await registerAndLoginUser(app, testUser);
+      const user = await userModel.findOne({ email: testUser.email });
+      userId = user._id;
+    });
+    afterEach(async () => {
+      await Promise.all([
+        userModel.deleteMany({}),
+        orderModel.deleteMany({}),
+        productModel.deleteMany({}),
+        categoryModel.deleteMany({})
+      ]);
+    }); 
+
+    test("user can fetch their orders", async () => {
+      const product = await createTestProduct();
+      await orderModel.create({
+        products: [product._id],
+        buyer: userId,
+        payment: { success: true },
+        status: "Processing",
+      });
+
+      const res = await request(app)
+        .get("/api/v1/auth/orders")
+        .set("Authorization", `Bearer ${userToken}`);
+      expect(res.statusCode).toBe(200);
+    });
+
+    test("admin can fetch all orders", async () => {
+      const product = await createTestProduct();
+      await orderModel.create({
+        products: [product._id],
+        buyer: userId,
+        payment: { success: true },
+        status: "Processing",
+      });
+
+      const res = await request(app)
+        .get("/api/v1/auth/all-orders")
+        .set("Authorization", `Bearer ${adminToken}`);
+
+      console.log("Response status:", res.statusCode);
+      console.log("Response body:", res.body);
+
+      expect(res.statusCode).toBe(200);
+    });
+
+    test("non-admin cannot fetch all orders", async () => {
+      const res = await request(app)
+        .get("/api/v1/auth/all-orders")
+        .set("Authorization", `Bearer ${userToken}`);
+      expect(res.statusCode).toBe(403);
+    });
+
+    test("admin can update order status", async () => {
+      const product = await createTestProduct();
+      const order = await orderModel.create({
+        products: [product._id],
+        buyer: userId,
+        payment: { success: true },
+        status: "Processing",
+      });
+
+
+      const res = await request(app)
+        .put(`/api/v1/auth/order-status/${order._id}`)
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send({ status: "Shipped" });
+
+      expect(res.statusCode).toBe(200);
+      const updatedOrder = await orderModel.findById(order._id);
+      expect(updatedOrder.status).toBe("Shipped");
+    });
+
+    test("non-admin cannot update order status", async () => {
+      const product = await createTestProduct();
+      const order = await orderModel.create({
+        products: [product._id],
+        buyer: userId,
+        payment: { success: true },
+        status: "Processing",
+      });
+
+      const res = await request(app)
+        .put(`/api/v1/auth/order-status/${order._id}`)
+        .set("Authorization", `Bearer ${userToken}`)
+        .send({ status: "Shipped" });
+
+      expect(res.statusCode).toBe(403);
+    });
+  });
 });
+
