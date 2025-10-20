@@ -13,6 +13,11 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+let mockAuth = { token: "", user: null };
+jest.mock("../context/auth", () => ({
+  useAuth: () => [mockAuth, jest.fn()],
+}));
+
 describe("Spinner Component (unit)", () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -76,7 +81,9 @@ describe("Spinner Component (unit)", () => {
 
     // Assert
     expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith("/login", { state: "/protected" });
+    expect(mockNavigate).toHaveBeenCalledWith("/login", {
+      state: "/protected",
+    });
   });
 
   it("should navigate to the provided custom path when countdown reaches 0", () => {
@@ -184,6 +191,8 @@ describe("Spinner Component (unit)", () => {
     act(() => jest.advanceTimersByTime(2000));
 
     // Assert
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/in 1 second\b/i);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      /in 1 second\b/i
+    );
   });
 });
