@@ -14,6 +14,12 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+// mock useauth
+let mockAuth = { token: "", user: null };
+jest.mock("../context/auth", () => ({
+  useAuth: () => [mockAuth, jest.fn()],
+}));
+
 describe("Spinner integration (top-down)", () => {
   beforeEach(() => {
     jest.useFakeTimers();

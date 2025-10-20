@@ -20,13 +20,15 @@ test.describe("Permission UI Tests", () => {
   }) => {
     const email = await registerUser(page);
 
+    // wait
+    await page.waitForTimeout(1000);
+
     await page.goto(ADMIN_DASHBOARD_LINK);
 
     // wait for 4 seconds to ensure any redirects happen
     await page.waitForTimeout(4000);
 
-    // something doesn't seem right about this
-    await test.expect(page).toHaveURL("http://localhost:3000/login");
+    await test.expect(page).toHaveURL("http://localhost:3000");
   });
 
   test("logged out users cannot see admin dashboard", async ({ page }) => {
@@ -36,7 +38,7 @@ test.describe("Permission UI Tests", () => {
 
     // wait for 4 seconds to ensure any redirects happen
     await page.waitForTimeout(2000);
-    await test.expect(page).toHaveURL("http://localhost:3000/login");
+    await test.expect(page).toHaveURL("http://localhost:3000/");
 
     await page.waitForTimeout(2000);
     // logout

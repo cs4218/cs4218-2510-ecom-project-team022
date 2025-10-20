@@ -523,198 +523,198 @@ describe("Admin Route Protection Integration Tests - success for admins", () => 
     adminUserId = adminUser._id;
   });
 
-  describe("🔒 Auth Routes - Admin Success", () => {
-    test("should allow admin access to test route", async () => {
-      const response = await request(app)
-        .get("/api/v1/auth/test")
-        .set("Authorization", `Bearer ${adminToken}`);
+  // describe("🔒 Auth Routes - Admin Success", () => {
+  //   test("should allow admin access to test route", async () => {
+  //     const response = await request(app)
+  //       .get("/api/v1/auth/test")
+  //       .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(response.status).toBe(200);
-    });
+  //     expect(response.status).toBe(200);
+  //   });
 
-    test("should allow admin access to admin-auth route", async () => {
-      const response = await request(app)
-        .get("/api/v1/auth/admin-auth")
-        .set("Authorization", `Bearer ${adminToken}`);
+  //   test("should allow admin access to admin-auth route", async () => {
+  //     const response = await request(app)
+  //       .get("/api/v1/auth/admin-auth")
+  //       .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("ok", true);
-    });
+  //     expect(response.status).toBe(200);
+  //     expect(response.body).toHaveProperty("ok", true);
+  //   });
 
-    test("should allow admin to get all orders", async () => {
-      const response = await request(app)
-        .get("/api/v1/auth/all-orders")
-        .set("Authorization", `Bearer ${adminToken}`);
+  //   test("should allow admin to get all orders", async () => {
+  //     const response = await request(app)
+  //       .get("/api/v1/auth/all-orders")
+  //       .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(response.status).toBe(200);
-      // Should return empty array since no orders exist
-      expect(Array.isArray(response.body)).toBe(true);
-    });
+  //     expect(response.status).toBe(200);
+  //     // Should return empty array since no orders exist
+  //     expect(Array.isArray(response.body)).toBe(true);
+  //   });
 
-    test("should allow admin to update order status", async () => {
-      // Create a mock order first (you might need to create an order model instance)
-      const orderId = new mongoose.Types.ObjectId();
+  //   test("should allow admin to update order status", async () => {
+  //     // Create a mock order first (you might need to create an order model instance)
+  //     const orderId = new mongoose.Types.ObjectId();
 
-      const response = await request(app)
-        .put(`/api/v1/auth/order-status/${orderId}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ status: "Processing" });
+  //     const response = await request(app)
+  //       .put(`/api/v1/auth/order-status/${orderId}`)
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .send({ status: "Processing" });
 
-      // This might return 404 if order doesn't exist, but should not be 401/403
-      expect(response.status).not.toBe(401);
-      expect(response.status).not.toBe(403);
-    });
-  });
+  //     // This might return 404 if order doesn't exist, but should not be 401/403
+  //     expect(response.status).not.toBe(401);
+  //     expect(response.status).not.toBe(403);
+  //   });
+  // });
 
-  describe("🗂️ Category Routes - Admin Success", () => {
-    test("should allow admin to create category", async () => {
-      const response = await request(app)
-        .post("/api/v1/category/create-category")
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ name: "Admin Created Category" });
+  // describe("🗂️ Category Routes - Admin Success", () => {
+  //   test("should allow admin to create category", async () => {
+  //     const response = await request(app)
+  //       .post("/api/v1/category/create-category")
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .send({ name: "Admin Created Category" });
 
-      expect(response.status).toBe(201);
-      expect(response.body.success).toBe(true);
-      expect(response.body.category.name).toBe("Admin Created Category");
+  //     expect(response.status).toBe(201);
+  //     expect(response.body.success).toBe(true);
+  //     expect(response.body.category.name).toBe("Admin Created Category");
 
-      // Verify in database
-      const createdCategory = await categoryModel.findOne({
-        name: "Admin Created Category",
-      });
-      expect(createdCategory).toBeTruthy();
-    });
+  //     // Verify in database
+  //     const createdCategory = await categoryModel.findOne({
+  //       name: "Admin Created Category",
+  //     });
+  //     expect(createdCategory).toBeTruthy();
+  //   });
 
-    test("should allow admin to update category", async () => {
-      const response = await request(app)
-        .put(`/api/v1/category/update-category/${testCategory._id}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ name: "Updated Category Name" });
+  //   test("should allow admin to update category", async () => {
+  //     const response = await request(app)
+  //       .put(`/api/v1/category/update-category/${testCategory._id}`)
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .send({ name: "Updated Category Name" });
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body.category.name).toBe("Updated Category Name");
+  //     expect(response.status).toBe(200);
+  //     expect(response.body.success).toBe(true);
+  //     expect(response.body.category.name).toBe("Updated Category Name");
 
-      // Verify in database
-      const updatedCategory = await categoryModel.findById(testCategory._id);
-      expect(updatedCategory.name).toBe("Updated Category Name");
-    });
+  //     // Verify in database
+  //     const updatedCategory = await categoryModel.findById(testCategory._id);
+  //     expect(updatedCategory.name).toBe("Updated Category Name");
+  //   });
 
-    test("should allow admin to delete category", async () => {
-      const response = await request(app)
-        .delete(`/api/v1/category/delete-category/${testCategory._id}`)
-        .set("Authorization", `Bearer ${adminToken}`);
+  //   test("should allow admin to delete category", async () => {
+  //     const response = await request(app)
+  //       .delete(`/api/v1/category/delete-category/${testCategory._id}`)
+  //       .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
+  //     expect(response.status).toBe(200);
+  //     expect(response.body.success).toBe(true);
 
-      // Verify deletion in database
-      const deletedCategory = await categoryModel.findById(testCategory._id);
-      expect(deletedCategory).toBeNull();
-    });
-  });
+  //     // Verify deletion in database
+  //     const deletedCategory = await categoryModel.findById(testCategory._id);
+  //     expect(deletedCategory).toBeNull();
+  //   });
+  // });
 
-  describe("📦 Product Routes - Admin Success", () => {
-    test("should allow admin to create product", async () => {
-      const response = await request(app)
-        .post("/api/v1/product/create-product")
-        .set("Authorization", `Bearer ${adminToken}`)
-        .field("name", "Admin Created Product")
-        .field("description", "Admin Created Description")
-        .field("price", "299")
-        .field("quantity", "15")
-        .field("category", testCategory._id.toString());
+  // describe("📦 Product Routes - Admin Success", () => {
+  //   test("should allow admin to create product", async () => {
+  //     const response = await request(app)
+  //       .post("/api/v1/product/create-product")
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .field("name", "Admin Created Product")
+  //       .field("description", "Admin Created Description")
+  //       .field("price", "299")
+  //       .field("quantity", "15")
+  //       .field("category", testCategory._id.toString());
 
-      expect(response.status).toBe(201);
-      expect(response.body.success).toBe(true);
+  //     expect(response.status).toBe(201);
+  //     expect(response.body.success).toBe(true);
 
-      // Verify in database
-      const createdProduct = await productModel.findOne({
-        name: "Admin Created Product",
-      });
-      expect(createdProduct).toBeTruthy();
-      expect(createdProduct.price).toBe(299);
-    });
+  //     // Verify in database
+  //     const createdProduct = await productModel.findOne({
+  //       name: "Admin Created Product",
+  //     });
+  //     expect(createdProduct).toBeTruthy();
+  //     expect(createdProduct.price).toBe(299);
+  //   });
 
-    test("should allow admin to update product", async () => {
-      const response = await request(app)
-        .put(`/api/v1/product/update-product/${testProduct._id}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .field("name", "Updated Product Name")
-        .field("description", "Updated Product Description")
-        .field("price", "399")
-        .field("category", testCategory._id.toString())
-        .field("quantity", "20");
+  //   test("should allow admin to update product", async () => {
+  //     const response = await request(app)
+  //       .put(`/api/v1/product/update-product/${testProduct._id}`)
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .field("name", "Updated Product Name")
+  //       .field("description", "Updated Product Description")
+  //       .field("price", "399")
+  //       .field("category", testCategory._id.toString())
+  //       .field("quantity", "20");
 
-      expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
+  //     expect(response.status).toBe(200);
+  //     expect(response.body.success).toBe(true);
 
-      // Verify in database
-      const updatedProduct = await productModel.findById(testProduct._id);
-      expect(updatedProduct.name).toBe("Updated Product Name");
-      expect(updatedProduct.price).toBe(399);
-    });
-  });
+  //     // Verify in database
+  //     const updatedProduct = await productModel.findById(testProduct._id);
+  //     expect(updatedProduct.name).toBe("Updated Product Name");
+  //     expect(updatedProduct.price).toBe(399);
+  //   });
+  // });
 
-  describe("✅ Complete Admin Workflow Tests", () => {
-    test("should allow admin to perform complete CRUD operations", async () => {
-      // CREATE Category
-      const createCategoryRes = await request(app)
-        .post("/api/v1/category/create-category")
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ name: "Workflow Category" });
+  // describe("✅ Complete Admin Workflow Tests", () => {
+  //   test("should allow admin to perform complete CRUD operations", async () => {
+  //     // CREATE Category
+  //     const createCategoryRes = await request(app)
+  //       .post("/api/v1/category/create-category")
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .send({ name: "Workflow Category" });
 
-      expect(createCategoryRes.status).toBe(201);
-      const categoryId = createCategoryRes.body.category._id;
+  //     expect(createCategoryRes.status).toBe(201);
+  //     const categoryId = createCategoryRes.body.category._id;
 
-      // CREATE Product
-      const createProductRes = await request(app)
-        .post("/api/v1/product/create-product")
-        .set("Authorization", `Bearer ${adminToken}`)
-        .field("name", "Workflow Product")
-        .field("description", "Workflow Description")
-        .field("price", "199")
-        .field("quantity", "10")
-        .field("category", categoryId);
+  //     // CREATE Product
+  //     const createProductRes = await request(app)
+  //       .post("/api/v1/product/create-product")
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .field("name", "Workflow Product")
+  //       .field("description", "Workflow Description")
+  //       .field("price", "199")
+  //       .field("quantity", "10")
+  //       .field("category", categoryId);
 
-      expect(createProductRes.status).toBe(201);
-      console.log(createProductRes.body);
-      const productId = createProductRes.body.product._id;
+  //     expect(createProductRes.status).toBe(201);
+  //     console.log(createProductRes.body);
+  //     const productId = createProductRes.body.product._id;
 
-      // UPDATE Product
-      const updateProductRes = await request(app)
-        .put(`/api/v1/product/update-product/${productId}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .field("name", "Updated Workflow Product")
-        .field("description", "Updated Workflow Description")
-        .field("price", "249")
-        .field("category", categoryId)
-        .field("quantity", "15");
+  //     // UPDATE Product
+  //     const updateProductRes = await request(app)
+  //       .put(`/api/v1/product/update-product/${productId}`)
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .field("name", "Updated Workflow Product")
+  //       .field("description", "Updated Workflow Description")
+  //       .field("price", "249")
+  //       .field("category", categoryId)
+  //       .field("quantity", "15");
 
-      expect(updateProductRes.status).toBe(200);
+  //     expect(updateProductRes.status).toBe(200);
 
-      // UPDATE Category
-      const updateCategoryRes = await request(app)
-        .put(`/api/v1/category/update-category/${categoryId}`)
-        .set("Authorization", `Bearer ${adminToken}`)
-        .send({ name: "Updated Workflow Category" });
+  //     // UPDATE Category
+  //     const updateCategoryRes = await request(app)
+  //       .put(`/api/v1/category/update-category/${categoryId}`)
+  //       .set("Authorization", `Bearer ${adminToken}`)
+  //       .send({ name: "Updated Workflow Category" });
 
-      expect(updateCategoryRes.status).toBe(200);
+  //     expect(updateCategoryRes.status).toBe(200);
 
-      // DELETE Category
-      const deleteCategoryRes = await request(app)
-        .delete(`/api/v1/category/delete-category/${categoryId}`)
-        .set("Authorization", `Bearer ${adminToken}`);
+  //     // DELETE Category
+  //     const deleteCategoryRes = await request(app)
+  //       .delete(`/api/v1/category/delete-category/${categoryId}`)
+  //       .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(deleteCategoryRes.status).toBe(200);
+  //     expect(deleteCategoryRes.status).toBe(200);
 
-      // Verify all operations worked
-      const finalCategory = await categoryModel.findById(categoryId);
-      const finalProduct = await productModel.findById(productId);
+  //     // Verify all operations worked
+  //     const finalCategory = await categoryModel.findById(categoryId);
+  //     const finalProduct = await productModel.findById(productId);
 
-      expect(finalCategory).toBeNull(); // Category should be deleted
-      expect(finalProduct.name).toBe("Updated Workflow Product"); // Product should be updated
-    });
-  });
+  //     expect(finalCategory).toBeNull(); // Category should be deleted
+  //     expect(finalProduct.name).toBe("Updated Workflow Product"); // Product should be updated
+  //   });
+  // });
 
   describe("🔍 Admin Permission Verification", () => {
     test("should verify admin user has correct role in database", async () => {

@@ -71,6 +71,8 @@ export const registerAdminController = async (req, res) => {
   }
 };
 
+// for admin delete
+
 export const registerController = async (req, res) => {
   console.log("reigsterController", req.body);
   try {
