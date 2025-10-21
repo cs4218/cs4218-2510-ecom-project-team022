@@ -319,6 +319,21 @@ User
 - Logged in user update profile --> verify profile updated in 1. top bar 2. profile page 3. cart page
 
 #### Yi Jing
+View/ Select Category
+- Categories --> verify categories render correctly (should have at least one category)
+- Categories --> click on the first category --> verify that at least one product is visible
+
+Search
+- Search (empty input) --> click search --> verify that nothing changes
+- Search (valid input with no matchings to products) --> click search --> verify that no products are rendered
+- Search (valid input with matchings to products)  --> click search --> verify that products contain search keyword
+- Log in --> Search (valid input with matchings to products)  --> click search --> verify that products contain search keyword
+
+View logged-in user's order dashboard
+- Log in --> <username> --> Dashboard --> Orders --> verifiy that orders are rendered correctly (correct headers, correct number of orders)
+
+Admin view all orders
+- Log in --> Log in --> <username> --> Dashboard --> Orders --> verifiy that orders are rendered correctly (correct headers, correct number of orders)
 
 #### Tzu Che
 ##### Header
