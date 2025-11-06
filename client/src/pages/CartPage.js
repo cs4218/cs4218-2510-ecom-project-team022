@@ -32,11 +32,10 @@ const CartPage = () => {
     }
   };
 
-  const removeCartItem = (pid) => {
+  const removeCartItem = (index) => {
     try {
       const myCart = Array.isArray(cart) ? [...cart] : [];
-      const index = myCart.findIndex((item) => item?._id === pid);
-      if (index > -1) {
+      if (index > -1 && index < myCart.length) {
         myCart.splice(index, 1);
         setCart(myCart);
         localStorage.setItem("cart", JSON.stringify(myCart));
@@ -107,8 +106,8 @@ const CartPage = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-7 p-0 m-0">
-              {(Array.isArray(cart) ? cart : []).map((p) => (
-                <div className="row card flex-row" key={p?._id}>
+              {(Array.isArray(cart) ? cart : []).map((p, index) => (
+                <div className="row card flex-row" key={index}>
                   <div className="col-md-4">
                     <img
                       src={`/api/v1/product/product-photo/${p?._id}`}
@@ -126,7 +125,7 @@ const CartPage = () => {
                   <div className="col-md-4 cart-remove-btn">
                     <button
                       className="btn btn-danger"
-                      onClick={() => removeCartItem(p?._id)}
+                      onClick={() => removeCartItem(index)}
                     >
                       Remove
                     </button>

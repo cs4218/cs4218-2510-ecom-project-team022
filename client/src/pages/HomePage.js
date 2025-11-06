@@ -103,6 +103,7 @@ const HomePage = () => {
         radio,
       });
       setProducts(Array.isArray(data?.products) ? data.products : []);
+      setTotal(Number.isFinite(data?.total) ? data.total : 0);
       if (page !== 1) setPage(1);
     } catch (error) {
       console.log(error);
@@ -114,6 +115,7 @@ const HomePage = () => {
     setChecked([]);
     setRadio([]);
     if (page !== 1) setPage(1);
+    getTotal();
     getAllProducts();
   };
 
