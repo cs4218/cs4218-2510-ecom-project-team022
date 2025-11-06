@@ -221,14 +221,10 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 #### Marcus
 
-| Feature          | Client Related Files (/client/src/)                                                         | Server Related Files (./)                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Protected Routes | - context/auth.js                                                                           | - helpers/authHelper.js <br> - middlewares/authMiddleware.js                                                             |
-| Registration     | - pages/Auth/Register.js                                                                    | - controllers/authController.js <br> 1. registerController <br> 2. loginController <br> 3. forgotPasswordController <br> |
-| Login            | - pages/Auth/Login.js                                                                       | (same as above)                                                                                                          |
-| General          | - components/Routes/Private.js <br> - components/UserMenu.js <br> - pages/user/Dashboard.js | - models/userModel.js                                                                                                    |
-| Profile          | - pages/user/Profile.js                                                                     |                                                                                                                          |
-| Admin Actions    | - pages/admin/CreateProduct.js <br> - pages/admin/UpdateProduct.js                          |                                                                                                                          |
+| Feature        | Client Related Files (/client/src/)           | Server Related Files (./)                                                                                                                                                                                           |
+| -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication | - context/auth.js (Login.integration.test.js) | - controllers/authController.js <br> 1. loginController <br> 2. registerController <br> 3. forgotPasswordController <br> 4. updateProfileController<br>- helpers/authHelper.js (authController.integration.test.js) |
+| Permission     | -                                             | - middlewares/authMiddleware.js (adminRouteProtection.integration.test.js)                                                                                                                                          |
 
 #### Yi Jing
 
@@ -255,8 +251,8 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 ##### User Actions - Products per Category
 
-- Categories -> Choose Category -> Product Per Category -> View Product Details 
-- Categories -> All Categories -> Categories Page -> Choose Category -> Product Per Category -> View Product Details 
+- Categories -> Choose Category -> Product Per Category -> View Product Details
+- Categories -> All Categories -> Categories Page -> Choose Category -> Product Per Category -> View Product Details
 
 ##### User Actions - Home Page Product Processing
 
@@ -298,6 +294,74 @@ The following shows the scope of our individal unit testing and bug fixing.
 
 #### Marcus
 
+Route permission protection
+
+- Not-registered or logged in user tries to access user dashboard --> verify denied
+- Newly-registered user tries to access admin dashboard --> verify denied
+- Logged in non-admin user tries to access admin dashboard --> verify denied
+- Initially logged-in user logging out trying to access user dashboard --> verify denied
+- Initially logged-in user logging out trying to access admin dashboard --> verify denied
+- Admin user logging in and trying to access admin dashboard --> verify success
+
+Authentication
+
+- Register but with already registered email --> verify "email already registered" toast
+- Register with correct details --> verify "registered" toast
+- Login with correct details --> verify "logged in" toast
+- Login with incorrect details --> verify "incorrect login details" toast
+- Logged in user logs out --> verify redirect
+
+User
+
+- Newly registered user checks order dashboard --> verify no orders
+- Logged in user should have the correct name on the top header bar
+- Logged in user should have the correct name in the dashboard
+- Logged in user update profile --> verify profile updated in 1. top bar 2. profile page 3. cart page
+
 #### Yi Jing
+View/ Select Category
+- Categories --> verify categories render correctly (should have at least one category)
+- Categories --> click on the first category --> verify that at least one product is visible
+
+Search
+- Search (empty input) --> click search --> verify that nothing changes
+- Search (valid input with no matchings to products) --> click search --> verify that no products are rendered
+- Search (valid input with matchings to products)  --> click search --> verify that products contain search keyword
+- Log in --> Search (valid input with matchings to products)  --> click search --> verify that products contain search keyword
+
+View logged-in user's order dashboard
+- Log in --> <username> --> Dashboard --> Orders --> verifiy that orders are rendered correctly (correct headers, correct number of orders)
+
+Admin view all orders
+- Log in --> Log in --> <username> --> Dashboard --> Orders --> verifiy that orders are rendered correctly (correct headers, correct number of orders)
 
 #### Tzu Che
+##### Header
+
+- Header -> Verify brand logo, navigation links, and cart badge are visible and correctly displayed.
+- Header -> Test login and logout behaviour for guests, registered users, and administrators.
+- Header -> Confirm users are redirected to the correct dashboard based on their role after logging in.
+- Header -> Ensure categories dropdown loads properly and navigates to the selected category page.
+- Header -> Click header logo when not on homepage -> verify it redirects correctly to homepage.
+
+##### Footer
+
+- Footer -> Verify footer renders correctly on all pages and displays proper copyright text.
+- Footer -> Click “About”, “Contact”, and “Privacy Policy” links -> verify each navigates to the correct page.
+
+##### Static Pages (About, Contact, Privacy Policy, Page Not Found)
+
+- About/Contact/Policy/404 -> Verify content, titles, and layout display correctly.
+- About/Contact/Policy/404 -> Check that all images and hyperlinks render properly and lead to intended destinations.
+- 404 Page -> Click “Go Back” button -> verify it redirects correctly to HomePage.
+
+##### HomePage Filters
+
+- Homepage -> Apply category filters (checkbox selection) -> Apply price filters (radio selection) -> Click "RESET FILTERS" button -> Verify both visual state and content state reset correctly (identified critical bug where visual filters remained selected despite content resetting).
+- Homepage -> Apply multiple filters -> Reset filters -> Repeat cycle multiple times -> Verify consistent state management across multiple reset cycles.
+- Homepage -> Apply filters -> Click "RESET FILTERS" -> Check URL -> Verify URL state remains consistent with visual and content state.
+- Homepage -> Apply individual filters -> Use "RESET FILTERS" for bulk reset -> Verify all checkboxes and radio buttons clear completely.
+- Homepage -> Apply filters during loading states -> Click "RESET FILTERS" -> Verify reset functionality works correctly even during async operations.
+
+
+

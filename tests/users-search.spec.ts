@@ -3,7 +3,7 @@ import { loginUser } from "./helpers";
 
 const BASE_URL = "http://localhost:3000";
 
-test.describe.parallel("Search Feature", () => {
+test.describe("Search Feature", () => {
 
   // Clicking search with empty input does nothing
   test("clicking search with empty input does nothing", async ({ page }) => {
@@ -14,6 +14,8 @@ test.describe.parallel("Search Feature", () => {
 
     // Save initial state
     const initialURL = page.url();
+    const results = page.locator(".card.m-2");
+    await expect(results.first()).toBeVisible({ timeout: 10000 });
     const initialProductCount = await page.locator(".card.m-2").count();
     const initialSearchValue = await searchBox.inputValue();
 
@@ -42,7 +44,7 @@ test.describe.parallel("Search Feature", () => {
     await searchBox.fill("osjefnowen");
     await searchBox.press("Enter");
 
-    await expect(page.getByText(/No Products Found/i)).toBeVisible();
+    await expect(page.getByText(/No Products Found/i)).toBeVisible({ timeout: 10000 });
   });
 
   // Valid text returns relevant search results
@@ -53,8 +55,10 @@ test.describe.parallel("Search Feature", () => {
     await searchBox.fill("book");
     await searchBox.press("Enter");
 
+    const searchResultsHeading = page.getByText("Search Results");
+    await expect(searchResultsHeading).toBeVisible({ timeout: 10000 });
+
     const results = page.locator(".card.m-2");
-    await expect(results.first()).toBeVisible({ timeout: 5000 });
 
     // Check product info contains the keyword
     const firstResultText = await results.first().textContent();
@@ -71,8 +75,11 @@ test.describe.parallel("Search Feature", () => {
     await searchBox.fill("book");
     await searchBox.press("Enter");
 
+    const searchResultsHeading = page.getByText("Search Results");
+    await expect(searchResultsHeading).toBeVisible({ timeout: 10000 });
+
     const results = page.locator(".card.m-2");
-    await expect(results.first()).toBeVisible({ timeout: 5000 });
+    
     const firstResultText = await results.first().textContent();
     expect(firstResultText?.toLowerCase()).toContain("book");
   });

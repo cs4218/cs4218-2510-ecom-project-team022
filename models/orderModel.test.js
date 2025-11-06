@@ -28,7 +28,7 @@ describe("Order Model Unit Tests", () => {
 
   it("should set default status to 'Not Process'", async () => {
     const order = new Order({ buyer: new mongoose.Types.ObjectId() });
-    expect(order.status).toBe("Not Process");
+    expect(order.status).toBe("Not Processed");
   });
 
   it("should enforce enum validation on status", async () => {

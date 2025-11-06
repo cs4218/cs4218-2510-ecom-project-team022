@@ -28,6 +28,25 @@ test.describe("User tests", () => {
     // expect No Orders Found
     await expect(page.getByText("No Orders Found")).toBeVisible();
   });
+
+  test("registered user can login and see address in cart", async ({
+    page,
+  }) => {
+    const { name, email, phone, address } = await registerUser(page);
+
+    // 1s
+    await page.waitForTimeout(1000);
+    await page.getByRole("button", { name }).click();
+    await page.getByRole("link", { name: "Dashboard" }).click();
+
+    // navigate to "cart"
+    // http://localhost:3000/cart
+
+    await page.getByRole("link", { name: "CART" }).click();
+
+    // expect address in the cart
+    await expect(page.getByText(address)).toBeVisible();
+  });
   test("registered user can login and see detailed user info", async ({
     page,
   }) => {
@@ -55,7 +74,9 @@ test.describe("User tests", () => {
     ).toHaveValue(address);
   });
 
-  test("registered user can edit and update user info", async ({ page }) => {
+  test("registered user can edit and update user info in detail page and in cart", async ({
+    page,
+  }) => {
     const { name, email } = await registerUser(page);
 
     // 1s
@@ -65,13 +86,17 @@ test.describe("User tests", () => {
 
     await page.getByTestId("profile-link").click();
 
-    // change name and phone number
+    // change name and phone number and address
     const newName = name + "edited";
     const newPhone = "9876543210";
+    const newAddress = "New Address";
     await page.getByRole("textbox", { name: "Enter Your Name" }).fill(newName);
     await page
       .getByRole("textbox", { name: "Enter Your Phone" })
       .fill(newPhone);
+    await page
+      .getByRole("textbox", { name: "Enter Your Address" })
+      .fill(newAddress);
     await page.getByRole("button", { name: "UPDATE" }).click();
 
     // expect success toast
@@ -87,5 +112,14 @@ test.describe("User tests", () => {
     await expect(
       page.getByRole("textbox", { name: "Enter Your Phone" })
     ).toHaveValue(newPhone);
+
+    // navigate to "cart"
+    // http://localhost:3000/cart
+
+    await page.getByRole("link", { name: "CART" }).click();
+
+    // verify the updated address
+    await expect(page.getByText(newName)).toHaveCount(2);
+    await expect(page.getByText(newAddress)).toBeVisible();
   });
 });
